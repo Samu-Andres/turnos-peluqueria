@@ -1,14 +1,17 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { Suspense, useActionState, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { signUp, type AuthFormState } from "@/lib/actions/auth";
 
 const initialState: AuthFormState = { error: null };
 
-export default function SignupPage() {
+function SignupForm() {
   const [state, formAction, pending] = useActionState(signUp, initialState);
   const [role, setRole] = useState<"client" | "owner">("client");
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
@@ -20,6 +23,8 @@ export default function SignupPage() {
       </div>
 
       <form action={formAction} className="flex flex-col gap-4">
+        {next && <input type="hidden" name="next" value={next} />}
+
         <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de cuenta">
           <label
             className={`cursor-pointer rounded-md border px-3 py-2 text-center text-sm font-medium ${
@@ -118,10 +123,21 @@ export default function SignupPage() {
 
       <p className="text-center text-sm text-neutral-500">
         ¿Ya tenés cuenta?{" "}
-        <Link href="/login" className="font-medium text-neutral-900 underline">
+        <Link
+          href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
+          className="font-medium text-neutral-900 underline"
+        >
           Iniciá sesión
         </Link>
       </p>
     </main>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignupForm />
+    </Suspense>
   );
 }

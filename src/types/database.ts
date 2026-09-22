@@ -201,7 +201,19 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      get_busy_intervals: {
+        Args: {
+          p_staff_id: string;
+          p_from: string;
+          p_to: string;
+        };
+        Returns: {
+          start_at: string;
+          end_at: string;
+        }[];
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

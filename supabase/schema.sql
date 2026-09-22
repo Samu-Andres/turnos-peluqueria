@@ -247,3 +247,35 @@ create policy "bookings: cliente o dueño actualizan (ej. cancelar/confirmar)"
 create index bookings_staff_start_idx on public.bookings (staff_id, start_at);
 create index bookings_client_idx on public.bookings (client_id);
 create index bookings_business_idx on public.bookings (business_id);
+
+-- ---------------------------------------------------------------
+-- get_busy_intervals: usada por el flujo público de reserva para
+-- calcular horarios disponibles. Las policies de bookings solo
+-- dejan leer turnos propios o del dueño del negocio, así que un
+-- visitante anónimo no puede hacer un select directo a bookings
+-- para saber qué horarios están ocupados. Esta función corre con
+-- los privilegios del dueño del esquema (security definer) pero
+-- solo expone start_at/end_at de turnos activos de un staff —
+-- nada de datos del cliente que reservó.
+-- ---------------------------------------------------------------
+create or replace function public.get_busy_intervals(
+  p_staff_id uuid,
+  p_from timestamptz,
+  p_to timestamptz
+)
+returns table (start_at timestamptz, end_at timestamptz)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select start_at, end_at
+  from public.bookings
+  where staff_id = p_staff_id
+    and status in ('pending', 'confirmed')
+    and start_at < p_to
+    and end_at > p_from;
+$$;
+
+grant execute on function public.get_busy_intervals(uuid, timestamptz, timestamptz)
+  to anon, authenticated;

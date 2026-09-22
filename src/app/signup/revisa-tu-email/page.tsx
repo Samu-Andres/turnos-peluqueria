@@ -1,6 +1,15 @@
 import Link from "next/link";
 
-export default function RevisaTuEmailPage() {
+type SearchParams = Promise<{ next?: string }>;
+
+export default async function RevisaTuEmailPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const { next } = await searchParams;
+  const loginHref = next ? `/login?next=${encodeURIComponent(next)}` : "/login";
+
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 px-6 text-center">
       <h1 className="text-2xl font-bold">Revisá tu email</h1>
@@ -8,7 +17,7 @@ export default function RevisaTuEmailPage() {
         Te mandamos un link de confirmación. Abrilo para activar tu cuenta y
         después iniciá sesión.
       </p>
-      <Link href="/login" className="text-sm font-medium text-neutral-900 underline">
+      <Link href={loginHref} className="text-sm font-medium text-neutral-900 underline">
         Volver a iniciar sesión
       </Link>
     </main>

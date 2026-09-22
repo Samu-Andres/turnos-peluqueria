@@ -2,13 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { deleteService, toggleServiceActive } from "@/lib/actions/services";
+import { formatPrice } from "@/lib/format";
 import type { Service } from "@/types/database";
-
-const priceFormatter = new Intl.NumberFormat("es-AR", {
-  style: "currency",
-  currency: "ARS",
-  maximumFractionDigits: 0,
-});
 
 export function ServiceRow({ service }: { service: Service }) {
   const [isPending, startTransition] = useTransition();
@@ -19,7 +14,7 @@ export function ServiceRow({ service }: { service: Service }) {
       <div className={service.active ? "" : "opacity-50"}>
         <p className="font-medium">{service.name}</p>
         <p className="text-sm text-neutral-500">
-          {service.duration_minutes} min · {priceFormatter.format(service.price)}
+          {service.duration_minutes} min · {formatPrice(service.price)}
           {!service.active && " · inactivo"}
         </p>
       </div>
