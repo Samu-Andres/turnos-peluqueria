@@ -1,13 +1,16 @@
 "use client";
 
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { signIn, type AuthFormState } from "@/lib/actions/auth";
 
 const initialState: AuthFormState = { error: null };
 
-export default function LoginPage() {
+function LoginForm() {
   const [state, formAction, pending] = useActionState(signIn, initialState);
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
@@ -19,6 +22,8 @@ export default function LoginPage() {
       </div>
 
       <form action={formAction} className="flex flex-col gap-4">
+        {next && <input type="hidden" name="next" value={next} />}
+
         <div className="flex flex-col gap-1">
           <label htmlFor="email" className="text-sm font-medium">
             Email
@@ -64,10 +69,21 @@ export default function LoginPage() {
 
       <p className="text-center text-sm text-neutral-500">
         ¿No tenés cuenta?{" "}
-        <Link href="/signup" className="font-medium text-neutral-900 underline">
+        <Link
+          href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"}
+          className="font-medium text-neutral-900 underline"
+        >
           Registrate
         </Link>
       </p>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }
