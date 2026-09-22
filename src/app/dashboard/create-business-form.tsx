@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { createBusiness, type BusinessFormState } from "@/lib/actions/business";
+import { LogoField } from "@/components/logo-field";
 
 const initialState: BusinessFormState = { error: null };
 
@@ -17,6 +18,8 @@ export function CreateBusinessForm() {
       </p>
 
       <form action={formAction} className="mt-6 flex flex-col gap-4">
+        <LogoField />
+
         <div className="flex flex-col gap-1">
           <label htmlFor="name" className="text-sm font-medium">
             Nombre del negocio

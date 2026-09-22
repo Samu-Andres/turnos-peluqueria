@@ -17,11 +17,21 @@ export function BusinessPanel({ business }: { business: Business }) {
   return (
     <div>
       <div className="flex items-start justify-between gap-4">
-        <h1 className="text-2xl font-bold">{business.name}</h1>
+        <div className="flex items-center gap-3">
+          {business.logo_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={business.logo_url}
+              alt=""
+              className="h-12 w-12 shrink-0 rounded-lg border border-border object-cover"
+            />
+          ) : null}
+          <h1 className="text-2xl font-bold">{business.name}</h1>
+        </div>
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="shrink-0 text-sm font-medium text-muted underline"
+          className="shrink-0 text-sm font-medium text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
         >
           Editar
         </button>
