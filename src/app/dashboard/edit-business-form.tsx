@@ -1,19 +1,26 @@
 "use client";
 
 import { useActionState } from "react";
-import { createBusiness, type BusinessFormState } from "@/lib/actions/business";
+import { updateBusiness, type BusinessFormState } from "@/lib/actions/business";
+import type { Business } from "@/types/database";
 
 const initialState: BusinessFormState = { error: null };
 
-export function CreateBusinessForm() {
-  const [state, formAction, pending] = useActionState(createBusiness, initialState);
+export function EditBusinessForm({
+  business,
+  onCancel,
+}: {
+  business: Business;
+  onCancel: () => void;
+}) {
+  const [state, formAction, pending] = useActionState(updateBusiness, initialState);
 
   return (
-    <div className="mx-auto max-w-sm">
-      <h1 className="text-2xl font-bold">Creá tu negocio</h1>
+    <div>
+      <h1 className="text-2xl font-bold">Editar negocio</h1>
       <p className="mt-1 text-sm text-neutral-500">
-        Esto arma la página pública donde tus clientes van a poder reservar
-        turnos.
+        Tu página pública sigue en <code>/{business.slug}</code>, eso no
+        cambia aunque edites el nombre.
       </p>
 
       <form action={formAction} className="mt-6 flex flex-col gap-4">
@@ -26,7 +33,7 @@ export function CreateBusinessForm() {
             name="name"
             type="text"
             required
-            placeholder="Peluquería Andrea"
+            defaultValue={business.name}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
           />
         </div>
@@ -39,6 +46,7 @@ export function CreateBusinessForm() {
             id="address"
             name="address"
             type="text"
+            defaultValue={business.address ?? ""}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
           />
         </div>
@@ -51,6 +59,7 @@ export function CreateBusinessForm() {
             id="phone"
             name="phone"
             type="tel"
+            defaultValue={business.phone ?? ""}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
           />
         </div>
@@ -63,7 +72,7 @@ export function CreateBusinessForm() {
             id="description"
             name="description"
             rows={2}
-            placeholder="Contales a tus clientes de qué se trata tu negocio"
+            defaultValue={business.description ?? ""}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
           />
         </div>
@@ -74,13 +83,22 @@ export function CreateBusinessForm() {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-        >
-          {pending ? "Creando..." : "Crear negocio"}
-        </button>
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            disabled={pending}
+            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          >
+            {pending ? "Guardando..." : "Guardar cambios"}
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="text-sm text-neutral-500 underline"
+          >
+            Cancelar
+          </button>
+        </div>
       </form>
     </div>
   );

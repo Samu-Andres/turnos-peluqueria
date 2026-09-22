@@ -76,3 +76,50 @@ export async function deleteService(serviceId: string): Promise<void> {
 
   revalidatePath("/dashboard/servicios");
 }
+
+export async function updateService(
+  serviceId: string,
+  _prevState: ServiceFormState,
+  formData: FormData
+): Promise<ServiceFormState> {
+  const { supabase, business } = await requireOwnerBusiness();
+
+  const name = String(formData.get("name") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const durationRaw = String(formData.get("duration_minutes") ?? "").trim();
+  const priceRaw = String(formData.get("price") ?? "").trim();
+
+  if (!name) {
+    return { error: "Poné un nombre para el servicio." };
+  }
+
+  const duration_minutes = Number(durationRaw);
+  if (!Number.isFinite(duration_minutes) || duration_minutes <= 0) {
+    return {
+      error: "La duración tiene que ser un número de minutos mayor a 0.",
+    };
+  }
+
+  const price = Number(priceRaw);
+  if (!Number.isFinite(price) || price < 0) {
+    return { error: "El precio tiene que ser un número válido." };
+  }
+
+  const { error } = await supabase
+    .from("services")
+    .update({
+      name,
+      description: description || null,
+      duration_minutes,
+      price,
+    })
+    .eq("id", serviceId)
+    .eq("business_id", business.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/dashboard/servicios");
+  return { error: null };
+}
