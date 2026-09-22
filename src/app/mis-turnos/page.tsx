@@ -107,7 +107,13 @@ export default async function MisTurnosPage({
                   </div>
 
                   {cancellable && (
-                    <div className="mt-3">
+                    <div className="mt-3 flex items-center gap-4">
+                      <Link
+                        href={`/mis-turnos/${booking.id}/reprogramar`}
+                        className="text-sm text-neutral-500 underline"
+                      >
+                        Reprogramar
+                      </Link>
                       <CancelBookingButton bookingId={booking.id} />
                     </div>
                   )}

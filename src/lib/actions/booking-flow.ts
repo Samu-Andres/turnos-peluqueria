@@ -26,7 +26,8 @@ export type SlotsResult =
 export async function getAvailableSlots(
   staffId: string,
   serviceId: string,
-  dateStr: string
+  dateStr: string,
+  excludeBookingId?: string
 ): Promise<SlotsResult> {
   const today = todayInBusinessTZ();
   if (dateStr < today) {
@@ -83,10 +84,12 @@ export async function getAvailableSlots(
     return { error: "No pudimos calcular la disponibilidad, probá de nuevo." };
   }
 
-  const busyIntervals: MinuteInterval[] = (busy ?? []).map((interval) => ({
-    startMinutes: isoToMinutesSinceMidnight(interval.start_at, dateStr),
-    endMinutes: isoToMinutesSinceMidnight(interval.end_at, dateStr),
-  }));
+  const busyIntervals: MinuteInterval[] = (busy ?? [])
+    .filter((interval) => interval.id !== excludeBookingId)
+    .map((interval) => ({
+      startMinutes: isoToMinutesSinceMidnight(interval.start_at, dateStr),
+      endMinutes: isoToMinutesSinceMidnight(interval.end_at, dateStr),
+    }));
 
   const earliestStartMinutes =
     dateStr === today ? nowMinutesInBusinessTZ() : 0;
