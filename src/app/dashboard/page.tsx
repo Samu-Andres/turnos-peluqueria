@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/actions/auth";
 import { CreateBusinessForm } from "./create-business-form";
@@ -59,9 +60,16 @@ export default async function DashboardPage() {
           )}
           {business.phone && <p className="text-sm">{business.phone}</p>}
 
-          <div className="mt-8 rounded-md border border-dashed border-neutral-300 p-4 text-sm text-neutral-500">
-            Próximo paso: cargar servicios, staff y horarios de
-            disponibilidad para que empiece a recibir reservas.
+          <div className="mt-8 flex flex-col gap-3">
+            <Link
+              href="/dashboard/servicios"
+              className="rounded-md border border-neutral-300 px-4 py-3 text-sm font-medium hover:bg-neutral-50"
+            >
+              Servicios →
+            </Link>
+            <div className="rounded-md border border-dashed border-neutral-300 px-4 py-3 text-sm text-neutral-500">
+              Próximamente: staff y horarios de disponibilidad.
+            </div>
           </div>
         </div>
       )}
