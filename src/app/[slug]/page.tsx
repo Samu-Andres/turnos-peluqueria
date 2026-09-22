@@ -6,6 +6,7 @@ import { getBusinessBySlug } from "@/lib/booking/get-business";
 import { formatPrice } from "@/lib/format";
 
 type Params = Promise<{ slug: string }>;
+type SearchParams = Promise<{ reservado?: string }>;
 
 export async function generateMetadata({
   params,
@@ -21,8 +22,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function BusinessPage({ params }: { params: Params }) {
+export default async function BusinessPage({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) {
   const { slug } = await params;
+  const { reservado } = await searchParams;
   const business = await getBusinessBySlug(slug);
 
   if (!business) {
@@ -73,6 +81,14 @@ export default async function BusinessPage({ params }: { params: Params }) {
           )}
         </div>
       </div>
+
+      {reservado === "1" && (
+        <p className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+          ¡Listo! Tu turno quedó reservado. Cualquier cosa te contactan al
+          teléfono que dejaste.
+        </p>
+      )}
+
       {business.description && (
         <p className="mt-4 text-sm">{business.description}</p>
       )}

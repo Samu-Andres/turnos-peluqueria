@@ -39,21 +39,14 @@ export default async function ReprogramarTurnoOwnerPage({
     redirect(`/dashboard/staff/${staffId}/turnos`);
   }
 
-  const [{ data: service }, { data: client }] = await Promise.all([
-    supabase
-      .from("services")
-      .select("name")
-      .eq("id", booking.service_id)
-      .maybeSingle(),
-    supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("id", booking.client_id)
-      .maybeSingle(),
-  ]);
+  const { data: service } = await supabase
+    .from("services")
+    .select("name")
+    .eq("id", booking.service_id)
+    .maybeSingle();
 
   const summary = `${service?.name ?? "Servicio"}${
-    client ? ` · ${client.full_name}` : ""
+    booking.client_name ? ` · ${booking.client_name}` : ""
   } — actualmente el ${formatDateTimeLongAR(booking.start_at)} a las ${formatTimeAR(
     booking.start_at
   )}`;

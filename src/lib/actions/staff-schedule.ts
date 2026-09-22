@@ -20,6 +20,7 @@ export type StaffDayBooking = {
   status: BookingStatus;
   serviceName: string;
   clientName: string;
+  clientPhone: string | null;
   clientAddress: string | null;
 };
 
@@ -71,7 +72,9 @@ export async function getStaffDaySchedule(
 
   const { data: bookingsRaw } = await supabase
     .from("bookings")
-    .select("id, start_at, end_at, status, service_id, client_id, client_address")
+    .select(
+      "id, start_at, end_at, status, service_id, client_name, client_phone, client_address"
+    )
     .eq("staff_id", staffId)
     .in("status", ["pending", "confirmed"])
     .gte("start_at", dayStart)
@@ -80,19 +83,12 @@ export async function getStaffDaySchedule(
 
   const rows = bookingsRaw ?? [];
   const serviceIds = [...new Set(rows.map((b) => b.service_id))];
-  const clientIds = [...new Set(rows.map((b) => b.client_id))];
 
-  const [servicesRes, clientsRes] = await Promise.all([
-    serviceIds.length
-      ? supabase.from("services").select("id, name").in("id", serviceIds)
-      : Promise.resolve({ data: [] as { id: string; name: string }[] }),
-    clientIds.length
-      ? supabase.from("profiles").select("id, full_name").in("id", clientIds)
-      : Promise.resolve({ data: [] as { id: string; full_name: string }[] }),
-  ]);
+  const { data: servicesData } = serviceIds.length
+    ? await supabase.from("services").select("id, name").in("id", serviceIds)
+    : { data: [] as { id: string; name: string }[] };
 
-  const serviceById = new Map((servicesRes.data ?? []).map((s) => [s.id, s.name]));
-  const clientById = new Map((clientsRes.data ?? []).map((c) => [c.id, c.full_name]));
+  const serviceById = new Map((servicesData ?? []).map((s) => [s.id, s.name]));
 
   const bookings: StaffDayBooking[] = rows.map((b) => ({
     id: b.id,
@@ -100,7 +96,8 @@ export async function getStaffDaySchedule(
     endTime: minutesToTimeLabel(isoToMinutesSinceMidnight(b.end_at, dateStr)),
     status: b.status,
     serviceName: serviceById.get(b.service_id) ?? "Servicio",
-    clientName: clientById.get(b.client_id) ?? "Cliente",
+    clientName: b.client_name ?? "Cliente",
+    clientPhone: b.client_phone,
     clientAddress: b.client_address,
   }));
 

@@ -14,7 +14,8 @@ type BookingRow = {
   end_at: string;
   status: BookingStatus;
   service_id: string;
-  client_id: string;
+  client_name: string | null;
+  client_phone: string | null;
   client_address: string | null;
 };
 
@@ -42,14 +43,14 @@ export default async function StaffTurnosPage({
   const [{ data: upcomingRaw }, { data: pastRaw }] = await Promise.all([
     supabase
       .from("bookings")
-      .select("id, start_at, end_at, status, service_id, client_id, client_address")
+      .select("id, start_at, end_at, status, service_id, client_name, client_phone, client_address")
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
       .gte("start_at", nowISO)
       .order("start_at", { ascending: true }),
     supabase
       .from("bookings")
-      .select("id, start_at, end_at, status, service_id, client_id, client_address")
+      .select("id, start_at, end_at, status, service_id, client_name, client_phone, client_address")
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
       .lt("start_at", nowISO)
@@ -62,19 +63,12 @@ export default async function StaffTurnosPage({
   const allRows = [...upcoming, ...past];
 
   const serviceIds = [...new Set(allRows.map((b) => b.service_id))];
-  const clientIds = [...new Set(allRows.map((b) => b.client_id))];
 
-  const [servicesRes, clientsRes] = await Promise.all([
-    serviceIds.length
-      ? supabase.from("services").select("id, name").in("id", serviceIds)
-      : Promise.resolve({ data: [] as { id: string; name: string }[] }),
-    clientIds.length
-      ? supabase.from("profiles").select("id, full_name").in("id", clientIds)
-      : Promise.resolve({ data: [] as { id: string; full_name: string }[] }),
-  ]);
+  const servicesRes = serviceIds.length
+    ? await supabase.from("services").select("id, name").in("id", serviceIds)
+    : { data: [] as { id: string; name: string }[] };
 
   const serviceById = new Map((servicesRes.data ?? []).map((s) => [s.id, s.name]));
-  const clientById = new Map((clientsRes.data ?? []).map((c) => [c.id, c.full_name]));
 
   function renderBooking(booking: BookingRow, pastBooking: boolean) {
     return (
@@ -86,12 +80,15 @@ export default async function StaffTurnosPage({
           <div>
             <p className="font-medium">
               {serviceById.get(booking.service_id) ?? "Servicio"} ·{" "}
-              {clientById.get(booking.client_id) ?? "Cliente"}
+              {booking.client_name ?? "Cliente"}
             </p>
             <p className="mt-1 text-sm capitalize text-muted">
               {formatDateTimeLongAR(booking.start_at)} a las{" "}
               {formatTimeAR(booking.start_at)}
             </p>
+            {booking.client_phone && (
+              <p className="mt-1 text-sm text-muted">Tel: {booking.client_phone}</p>
+            )}
             {booking.client_address && (
               <p className="mt-1 text-sm text-accent">
                 A domicilio: {booking.client_address}

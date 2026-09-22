@@ -28,7 +28,7 @@ export function BookingFlow({
   initialStaffId,
   initialDateStr,
   initialTime,
-  isLoggedIn,
+  prefillName,
   servesAtHome,
 }: {
   slug: string;
@@ -39,7 +39,7 @@ export function BookingFlow({
   initialStaffId?: string;
   initialDateStr?: string;
   initialTime?: string;
-  isLoggedIn: boolean;
+  prefillName?: string | null;
   servesAtHome: boolean;
 }) {
   const [serviceId, setServiceId] = useState<string | null>(() =>
@@ -95,8 +95,8 @@ export function BookingFlow({
 
   const boundCreateBooking: BoundBookingAction | null = useMemo(() => {
     if (!serviceId || !staffId) return null;
-    return createBooking.bind(null, businessId, serviceId, staffId);
-  }, [businessId, serviceId, staffId]);
+    return createBooking.bind(null, businessId, serviceId, staffId, slug);
+  }, [businessId, serviceId, staffId, slug]);
 
   return (
     <div className="mt-8 flex flex-col gap-8">
@@ -225,7 +225,7 @@ export function BookingFlow({
           staffId={staffId}
           dateStr={dateStr}
           time={time}
-          isLoggedIn={isLoggedIn}
+          prefillName={prefillName}
           servesAtHome={servesAtHome}
           action={boundCreateBooking}
         />
@@ -240,7 +240,7 @@ function ConfirmStep({
   staffId,
   dateStr,
   time,
-  isLoggedIn,
+  prefillName,
   servesAtHome,
   action,
 }: {
@@ -249,7 +249,7 @@ function ConfirmStep({
   staffId: string;
   dateStr: string;
   time: string;
-  isLoggedIn: boolean;
+  prefillName?: string | null;
   servesAtHome: boolean;
   action: BoundBookingAction;
 }) {
@@ -282,77 +282,105 @@ function ConfirmStep({
         </div>
       </dl>
 
-      {isLoggedIn ? (
-        <form action={formAction} className="mt-4 flex flex-col gap-3">
-          <input type="hidden" name="date" value={dateStr} />
-          <input type="hidden" name="time" value={time} />
+      <form action={formAction} className="mt-4 flex flex-col gap-3">
+        <input type="hidden" name="date" value={dateStr} />
+        <input type="hidden" name="time" value={time} />
 
-          {servesAtHome && (
-            <div className="flex flex-col gap-1">
-              <label htmlFor="client_address" className="text-sm font-medium">
-                Tu dirección
-              </label>
-              <input
-                id="client_address"
-                name="client_address"
-                type="text"
-                required
-                placeholder="Calle, número, piso/depto, barrio"
-                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
-              />
-              <p className="text-xs text-muted">
-                Este negocio atiende a domicilio: necesitamos tu dirección
-                para ir a cortarte el pelo.
-              </p>
-            </div>
-          )}
+        <div className="flex flex-col gap-1">
+          <label htmlFor="client_name" className="text-sm font-medium">
+            Nombre y apellido
+          </label>
+          <input
+            id="client_name"
+            name="client_name"
+            type="text"
+            required
+            defaultValue={prefillName ?? undefined}
+            placeholder="Tu nombre completo"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+          />
+        </div>
 
+        <div className="flex flex-col gap-1">
+          <label htmlFor="client_phone" className="text-sm font-medium">
+            Teléfono
+          </label>
+          <input
+            id="client_phone"
+            name="client_phone"
+            type="tel"
+            required
+            placeholder="Para que te puedan contactar"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+          />
+        </div>
+
+        {servesAtHome && (
           <div className="flex flex-col gap-1">
-            <label htmlFor="notes" className="text-sm font-medium">
-              Notas para la peluquería (opcional)
+            <label htmlFor="client_address" className="text-sm font-medium">
+              Tu dirección
             </label>
-            <textarea
-              id="notes"
-              name="notes"
-              rows={2}
+            <input
+              id="client_address"
+              name="client_address"
+              type="text"
+              required
+              placeholder="Calle, número, piso/depto, barrio"
               className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
             />
-          </div>
-
-          {state.error && (
-            <p className="text-sm text-red-400" role="alert">
-              {state.error}
+            <p className="text-xs text-muted">
+              Este negocio atiende a domicilio: necesitamos tu dirección
+              para ir a cortarte el pelo.
             </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={pending}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
-          >
-            {pending ? "Reservando..." : "Confirmar turno"}
-          </button>
-        </form>
-      ) : (
-        <div className="mt-4">
-          <p className="text-sm text-muted">
-            Necesitás una cuenta para confirmar el turno.
-          </p>
-          <div className="mt-3 flex gap-3">
-            <Link
-              href={`/login?next=${encodeURIComponent(nextUrl)}`}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover"
-            >
-              Iniciar sesión
-            </Link>
-            <Link
-              href={`/signup?next=${encodeURIComponent(nextUrl)}`}
-              className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-accent hover:text-accent"
-            >
-              Crear cuenta
-            </Link>
           </div>
+        )}
+
+        <div className="flex flex-col gap-1">
+          <label htmlFor="notes" className="text-sm font-medium">
+            Notas para la peluquería (opcional)
+          </label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows={2}
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+          />
         </div>
+
+        {state.error && (
+          <p className="text-sm text-red-400" role="alert">
+            {state.error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+        >
+          {pending ? "Reservando..." : "Confirmar turno"}
+        </button>
+      </form>
+
+      {!prefillName && (
+        <p className="mt-3 text-xs text-muted">
+          No hace falta cuenta para reservar. Si querés llevar un registro
+          de tus turnos,{" "}
+          <Link
+            href={`/login?next=${encodeURIComponent(nextUrl)}`}
+            className="text-accent underline decoration-accent/40 underline-offset-2 hover:text-accent-hover"
+          >
+            iniciá sesión
+          </Link>{" "}
+          o{" "}
+          <Link
+            href={`/signup?next=${encodeURIComponent(nextUrl)}`}
+            className="text-accent underline decoration-accent/40 underline-offset-2 hover:text-accent-hover"
+          >
+            creá una cuenta
+          </Link>{" "}
+          (podés hacerlo antes o después de reservar).
+        </p>
       )}
     </section>
   );

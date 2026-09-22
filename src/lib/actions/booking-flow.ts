@@ -110,13 +110,19 @@ export type BookingFormState = {
 
 /**
  * Confirma la reserva. Se usa junto con useActionState pero con los ids
- * de negocio/servicio/staff ya "bindeados" desde el server component que
- * la pasa al form.
+ * de negocio/servicio/staff (y el slug, para saber a dónde volver) ya
+ * "bindeados" desde el server component que la pasa al form.
+ *
+ * No hace falta tener cuenta para reservar: el form siempre pide
+ * nombre y teléfono. Si hay una sesión iniciada, el turno además queda
+ * asociado a esa cuenta (client_id) para que aparezca en "Mis turnos";
+ * si no, queda como reserva de invitado (client_id null).
  */
 export async function createBooking(
   businessId: string,
   serviceId: string,
   staffId: string,
+  slug: string,
   _prevState: BookingFormState,
   formData: FormData
 ): Promise<BookingFormState> {
@@ -126,17 +132,19 @@ export async function createBooking(
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return { error: "Iniciá sesión para confirmar la reserva." };
-  }
-
   const dateStr = String(formData.get("date") ?? "").trim();
   const timeStr = String(formData.get("time") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim();
   const clientAddress = String(formData.get("client_address") ?? "").trim();
+  const clientName = String(formData.get("client_name") ?? "").trim();
+  const clientPhone = String(formData.get("client_phone") ?? "").trim();
 
   if (!dateStr || !timeStr) {
     return { error: "Elegí una fecha y un horario." };
+  }
+
+  if (!clientName || !clientPhone) {
+    return { error: "Contanos tu nombre y tu teléfono para reservar." };
   }
 
   const [{ data: service }, { data: staff }, { data: business }] = await Promise.all([
@@ -189,12 +197,14 @@ export async function createBooking(
     business_id: businessId,
     staff_id: staffId,
     service_id: serviceId,
-    client_id: user.id,
+    client_id: user?.id ?? null,
     start_at: startAt,
     end_at: endAt,
     status: "confirmed",
     notes: notes || null,
     client_address: business?.serves_at_home ? clientAddress : null,
+    client_name: clientName,
+    client_phone: clientPhone,
   });
 
   if (error) {
@@ -205,5 +215,7 @@ export async function createBooking(
     return { error: error.message };
   }
 
-  redirect("/mis-turnos?reservado=1");
+  // Con cuenta: al listado de turnos. Como invitado no hay dónde
+  // listarlo, así que volvemos a la página del negocio con un aviso.
+  redirect(user ? "/mis-turnos?reservado=1" : `/${slug}?reservado=1`);
 }
