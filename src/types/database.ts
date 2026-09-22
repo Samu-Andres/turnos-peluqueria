@@ -38,6 +38,7 @@ export interface Database {
           phone?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       businesses: {
         Row: {
@@ -70,6 +71,7 @@ export interface Database {
           description?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       staff: {
         Row: {
@@ -96,6 +98,7 @@ export interface Database {
           active?: boolean;
           created_at?: string;
         };
+        Relationships: [];
       };
       services: {
         Row: {
@@ -128,6 +131,7 @@ export interface Database {
           active?: boolean;
           created_at?: string;
         };
+        Relationships: [];
       };
       working_hours: {
         Row: {
@@ -154,6 +158,7 @@ export interface Database {
           end_time?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
       bookings: {
         Row: {
@@ -192,8 +197,13 @@ export interface Database {
           notes?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }
 
