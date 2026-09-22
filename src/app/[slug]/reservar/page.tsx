@@ -46,6 +46,19 @@ export default async function ReservarPage({
       supabase.auth.getUser(),
     ]);
 
+  // Si ya está logueado, le precargamos el nombre para no pedírselo de
+  // nuevo (no hace falta cuenta para reservar, pero si la tiene, mejor
+  // no repetir datos que ya dio).
+  let prefillName: string | null = null;
+  if (userData.user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", userData.user.id)
+      .maybeSingle();
+    prefillName = profile?.full_name ?? null;
+  }
+
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
       <Link href={`/${slug}`} className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
@@ -65,7 +78,7 @@ export default async function ReservarPage({
           initialStaffId={query.staff}
           initialDateStr={query.date}
           initialTime={query.time}
-          isLoggedIn={Boolean(userData.user)}
+          prefillName={prefillName}
           servesAtHome={business.serves_at_home}
         />
       ) : (

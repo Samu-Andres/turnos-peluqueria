@@ -172,12 +172,14 @@ export interface Database {
           business_id: string;
           staff_id: string;
           service_id: string;
-          client_id: string;
+          client_id: string | null;
           start_at: string;
           end_at: string;
           status: BookingStatus;
           notes: string | null;
           client_address: string | null;
+          client_name: string | null;
+          client_phone: string | null;
           created_at: string;
         };
         Insert: {
@@ -185,12 +187,14 @@ export interface Database {
           business_id: string;
           staff_id: string;
           service_id: string;
-          client_id: string;
+          client_id?: string | null;
           start_at: string;
           end_at: string;
           status?: BookingStatus;
           notes?: string | null;
           client_address?: string | null;
+          client_name?: string | null;
+          client_phone?: string | null;
           created_at?: string;
         };
         Update: {
@@ -198,12 +202,14 @@ export interface Database {
           business_id?: string;
           staff_id?: string;
           service_id?: string;
-          client_id?: string;
+          client_id?: string | null;
           start_at?: string;
           end_at?: string;
           status?: BookingStatus;
           notes?: string | null;
           client_address?: string | null;
+          client_name?: string | null;
+          client_phone?: string | null;
           created_at?: string;
         };
         Relationships: [];

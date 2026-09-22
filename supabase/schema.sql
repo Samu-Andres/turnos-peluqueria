@@ -198,13 +198,16 @@ create table public.bookings (
   business_id uuid not null references public.businesses (id) on delete cascade,
   staff_id uuid not null references public.staff (id) on delete cascade,
   service_id uuid not null references public.services (id) on delete cascade,
-  client_id uuid not null references public.profiles (id) on delete cascade,
+  -- null = reserva de invitado, sin cuenta (ver client_name/client_phone).
+  client_id uuid references public.profiles (id) on delete cascade,
   start_at timestamptz not null,
   end_at timestamptz not null check (end_at > start_at),
   status text not null default 'pending'
     check (status in ('pending', 'confirmed', 'cancelled', 'completed')),
   notes text,
   client_address text,
+  client_name text,
+  client_phone text,
   created_at timestamptz not null default now()
 );
 
@@ -232,9 +235,13 @@ create policy "bookings: el cliente ve sus propios turnos"
     )
   );
 
-create policy "bookings: el cliente reserva a su propio nombre"
+-- Se puede reservar con cuenta (client_id = auth.uid()) o como
+-- invitado, sin cuenta (client_id null, con client_name/client_phone
+-- cargados a mano en el form). No se permite insertar un turno a
+-- nombre de otra cuenta.
+create policy "bookings: con cuenta o como invitado"
   on public.bookings for insert
-  with check (client_id = auth.uid());
+  with check (client_id is null or client_id = auth.uid());
 
 create policy "bookings: cliente o dueño actualizan (ej. cancelar/confirmar)"
   on public.bookings for update
@@ -362,3 +369,21 @@ alter table public.businesses
 
 alter table public.bookings
   add column if not exists client_address text;
+
+-- ---------------------------------------------------------------
+-- Reservar como invitado: ya no hace falta crear cuenta para sacar
+-- un turno. client_id pasa a ser opcional (null = invitado) y se
+-- suman client_name/client_phone, que el form de reserva completa
+-- siempre (con o sin sesión), así el dueño siempre tiene con quién
+-- comunicarse aunque el cliente no tenga cuenta.
+-- ---------------------------------------------------------------
+alter table public.bookings alter column client_id drop not null;
+alter table public.bookings add column if not exists client_name text;
+alter table public.bookings add column if not exists client_phone text;
+
+drop policy if exists "bookings: el cliente reserva a su propio nombre" on public.bookings;
+
+drop policy if exists "bookings: con cuenta o como invitado" on public.bookings;
+create policy "bookings: con cuenta o como invitado"
+  on public.bookings for insert
+  with check (client_id is null or client_id = auth.uid());

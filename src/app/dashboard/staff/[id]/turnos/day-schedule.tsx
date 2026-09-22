@@ -103,6 +103,11 @@ export function DaySchedule({ staffId }: { staffId: string }) {
                     {b.startTime} a {b.endTime} · {b.serviceName} ·{" "}
                     {b.clientName}
                   </span>
+                  {b.clientPhone && (
+                    <span className="text-xs text-muted">
+                      Tel: {b.clientPhone}
+                    </span>
+                  )}
                   {b.clientAddress && (
                     <span className="text-xs text-accent">
                       A domicilio: {b.clientAddress}
