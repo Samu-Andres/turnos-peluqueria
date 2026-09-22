@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { updateBusiness, type BusinessFormState } from "@/lib/actions/business";
+import { LogoField } from "@/components/logo-field";
 import type { Business } from "@/types/database";
 
 const initialState: BusinessFormState = { error: null };
@@ -24,6 +25,8 @@ export function EditBusinessForm({
       </p>
 
       <form action={formAction} className="mt-6 flex flex-col gap-4">
+        <LogoField currentUrl={business.logo_url} />
+
         <div className="flex flex-col gap-1">
           <label htmlFor="name" className="text-sm font-medium">
             Nombre del negocio

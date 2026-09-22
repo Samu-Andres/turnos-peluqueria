@@ -57,6 +57,7 @@ create table public.businesses (
   address text,
   phone text,
   description text,
+  logo_url text,
   created_at timestamptz not null default now()
 );
 
@@ -300,4 +301,47 @@ create policy "profiles: el dueño ve clientes con turnos en su negocio"
       where bookings.client_id = profiles.id
         and businesses.owner_id = auth.uid()
     )
+  );
+
+-- ---------------------------------------------------------------
+-- logo_url: para una base ya existente (creada antes de que
+-- businesses tuviera esta columna), sumarla sin romper nada.
+-- ---------------------------------------------------------------
+alter table public.businesses add column if not exists logo_url text;
+
+-- ---------------------------------------------------------------
+-- Storage: bucket público "logos" para los logos de cada negocio.
+-- Cada archivo se guarda como {owner_id}/logo-<timestamp>.<ext>, así
+-- que las policies solo dejan tocar objetos dentro de la carpeta del
+-- propio dueño (auth.uid()), pero cualquiera puede leerlos (bucket
+-- público, necesario para mostrarlos en la página pública del
+-- negocio).
+-- ---------------------------------------------------------------
+insert into storage.buckets (id, name, public)
+values ('logos', 'logos', true)
+on conflict (id) do nothing;
+
+create policy "logos: lectura pública"
+  on storage.objects for select
+  using (bucket_id = 'logos');
+
+create policy "logos: el dueño sube su logo"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'logos'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "logos: el dueño actualiza su logo"
+  on storage.objects for update
+  using (
+    bucket_id = 'logos'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "logos: el dueño borra su logo"
+  on storage.objects for delete
+  using (
+    bucket_id = 'logos'
+    and (storage.foldername(name))[1] = auth.uid()::text
   );

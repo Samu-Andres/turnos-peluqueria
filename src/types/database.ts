@@ -49,6 +49,7 @@ export interface Database {
           address: string | null;
           phone: string | null;
           description: string | null;
+          logo_url: string | null;
           created_at: string;
         };
         Insert: {
@@ -59,6 +60,7 @@ export interface Database {
           address?: string | null;
           phone?: string | null;
           description?: string | null;
+          logo_url?: string | null;
           created_at?: string;
         };
         Update: {
@@ -69,6 +71,7 @@ export interface Database {
           address?: string | null;
           phone?: string | null;
           description?: string | null;
+          logo_url?: string | null;
           created_at?: string;
         };
         Relationships: [];

@@ -50,12 +50,24 @@ export default async function BusinessPage({ params }: { params: Params }) {
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
-      <h1 className="text-3xl font-bold">{business.name}</h1>
-      {(business.address || business.phone) && (
-        <p className="mt-1 text-sm text-muted">
-          {[business.address, business.phone].filter(Boolean).join(" · ")}
-        </p>
-      )}
+      <div className="flex items-center gap-4">
+        {business.logo_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={business.logo_url}
+            alt={business.name}
+            className="h-16 w-16 shrink-0 rounded-xl border border-border object-cover shadow-sm shadow-black/30"
+          />
+        ) : null}
+        <div>
+          <h1 className="text-3xl font-bold">{business.name}</h1>
+          {(business.address || business.phone) && (
+            <p className="mt-1 text-sm text-muted">
+              {[business.address, business.phone].filter(Boolean).join(" · ")}
+            </p>
+          )}
+        </div>
+      </div>
       {business.description && (
         <p className="mt-4 text-sm">{business.description}</p>
       )}
