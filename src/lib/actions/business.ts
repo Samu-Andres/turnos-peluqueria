@@ -35,6 +35,7 @@ export async function createBusiness(
   const name = String(formData.get("name") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
 
   if (!name) {
     return { error: "Poné un nombre para tu negocio." };
@@ -64,7 +65,51 @@ export async function createBusiness(
     slug,
     address: address || null,
     phone: phone || null,
+    description: description || null,
   });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/dashboard");
+  redirect("/dashboard");
+}
+
+export async function updateBusiness(
+  _prevState: BusinessFormState,
+  formData: FormData
+): Promise<BusinessFormState> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const name = String(formData.get("name") ?? "").trim();
+  const address = String(formData.get("address") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+
+  if (!name) {
+    return { error: "Poné un nombre para tu negocio." };
+  }
+
+  // El slug no se toca al editar: cambiar el nombre no debería romper el
+  // link público que el dueño ya haya compartido.
+  const { error } = await supabase
+    .from("businesses")
+    .update({
+      name,
+      address: address || null,
+      phone: phone || null,
+      description: description || null,
+    })
+    .eq("owner_id", user.id);
 
   if (error) {
     return { error: error.message };

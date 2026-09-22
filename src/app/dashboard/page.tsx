@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/actions/auth";
+import { BusinessPanel } from "./business-panel";
 import { CreateBusinessForm } from "./create-business-form";
 
 export default async function DashboardPage() {
@@ -27,7 +27,7 @@ export default async function DashboardPage() {
 
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, name, slug, address, phone")
+    .select("*")
     .eq("owner_id", user.id)
     .maybeSingle();
 
@@ -47,38 +47,7 @@ export default async function DashboardPage() {
         </form>
       </div>
 
-      {!business ? (
-        <CreateBusinessForm />
-      ) : (
-        <div>
-          <h1 className="text-2xl font-bold">{business.name}</h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            Tu página pública: <code>/{business.slug}</code>
-          </p>
-          {business.address && (
-            <p className="mt-4 text-sm">{business.address}</p>
-          )}
-          {business.phone && <p className="text-sm">{business.phone}</p>}
-
-          <div className="mt-8 flex flex-col gap-3">
-            <Link
-              href="/dashboard/servicios"
-              className="rounded-md border border-neutral-300 px-4 py-3 text-sm font-medium hover:bg-neutral-50"
-            >
-              Servicios →
-            </Link>
-            <Link
-              href="/dashboard/staff"
-              className="rounded-md border border-neutral-300 px-4 py-3 text-sm font-medium hover:bg-neutral-50"
-            >
-              Staff →
-            </Link>
-            <div className="rounded-md border border-dashed border-neutral-300 px-4 py-3 text-sm text-neutral-500">
-              Próximamente: horarios de disponibilidad por persona.
-            </div>
-          </div>
-        </div>
-      )}
+      {!business ? <CreateBusinessForm /> : <BusinessPanel business={business} />}
     </main>
   );
 }

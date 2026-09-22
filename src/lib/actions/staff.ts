@@ -58,3 +58,30 @@ export async function deleteStaff(staffId: string): Promise<void> {
 
   revalidatePath("/dashboard/staff");
 }
+
+export async function updateStaff(
+  staffId: string,
+  _prevState: StaffFormState,
+  formData: FormData
+): Promise<StaffFormState> {
+  const { supabase, business } = await requireOwnerBusiness();
+
+  const full_name = String(formData.get("full_name") ?? "").trim();
+
+  if (!full_name) {
+    return { error: "Poné el nombre de la persona." };
+  }
+
+  const { error } = await supabase
+    .from("staff")
+    .update({ full_name })
+    .eq("id", staffId)
+    .eq("business_id", business.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/dashboard/staff");
+  return { error: null };
+}
