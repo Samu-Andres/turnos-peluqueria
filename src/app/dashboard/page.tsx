@@ -67,8 +67,14 @@ export default async function DashboardPage() {
             >
               Servicios →
             </Link>
+            <Link
+              href="/dashboard/staff"
+              className="rounded-md border border-neutral-300 px-4 py-3 text-sm font-medium hover:bg-neutral-50"
+            >
+              Staff →
+            </Link>
             <div className="rounded-md border border-dashed border-neutral-300 px-4 py-3 text-sm text-neutral-500">
-              Próximamente: staff y horarios de disponibilidad.
+              Próximamente: horarios de disponibilidad por persona.
             </div>
           </div>
         </div>
