@@ -13,13 +13,13 @@ export default async function ServiciosPage() {
     .order("created_at", { ascending: true });
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-6 py-12">
-      <Link href="/dashboard" className="text-sm text-neutral-500 underline">
+    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
+      <Link href="/dashboard" className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
         ← Volver al panel
       </Link>
 
       <h1 className="mt-4 text-2xl font-bold">Servicios de {business.name}</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-muted">
         Los servicios que tus clientes van a poder elegir al reservar un
         turno.
       </p>
@@ -32,13 +32,13 @@ export default async function ServiciosPage() {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted">
             Todavía no cargaste ningún servicio.
           </p>
         )}
       </div>
 
-      <div className="mt-10 border-t border-neutral-200 pt-8">
+      <div className="mt-10 border-t border-border pt-8">
         <h2 className="text-lg font-semibold">Agregar servicio</h2>
         <ServiceForm />
       </div>

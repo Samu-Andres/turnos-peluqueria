@@ -3,14 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTimeLongAR, formatTimeAR } from "@/lib/booking/time";
 import { CancelBookingButton } from "./cancel-booking-button";
-import type { Booking } from "@/types/database";
-
-const STATUS_LABELS: Record<Booking["status"], string> = {
-  pending: "Pendiente",
-  confirmed: "Confirmado",
-  cancelled: "Cancelado",
-  completed: "Completado",
-};
+import { STATUS_LABELS, statusBadgeClass } from "@/lib/booking/status-styles";
 
 export default async function MisTurnosPage({
   searchParams,
@@ -57,22 +50,22 @@ export default async function MisTurnosPage({
   const businessById = new Map((businessesRes.data ?? []).map((b) => [b.id, b]));
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-6 py-12">
-      <Link href="/" className="text-sm text-neutral-500 underline">
+    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
+      <Link href="/" className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
         ← Volver al inicio
       </Link>
 
       <h1 className="mt-4 text-2xl font-bold">Mis turnos</h1>
 
       {reservado === "1" && (
-        <p className="mt-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+        <p className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
           ¡Listo! Tu turno quedó reservado.
         </p>
       )}
 
       <div className="mt-8">
         {rows.length === 0 ? (
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted">
             Todavía no reservaste ningún turno.
           </p>
         ) : (
@@ -87,7 +80,7 @@ export default async function MisTurnosPage({
               return (
                 <li
                   key={booking.id}
-                  className="rounded-md border border-neutral-200 px-4 py-3"
+                  className="rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-border-strong"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -95,22 +88,22 @@ export default async function MisTurnosPage({
                         {service?.name ?? "Servicio"}
                         {business && ` · ${business.name}`}
                       </p>
-                      <p className="mt-1 text-sm capitalize text-neutral-500">
+                      <p className="mt-1 text-sm capitalize text-muted">
                         {formatDateTimeLongAR(booking.start_at)} a las{" "}
                         {formatTimeAR(booking.start_at)}
                         {staffMember && ` · con ${staffMember.full_name}`}
                       </p>
                     </div>
-                    <span className="shrink-0 rounded-full border border-neutral-300 px-2 py-1 text-xs font-medium text-neutral-600">
+                    <span className={statusBadgeClass(booking.status)}>
                       {STATUS_LABELS[booking.status]}
                     </span>
                   </div>
 
                   {cancellable && (
-                    <div className="mt-3 flex items-center gap-4">
+                    <div className="mt-3 flex flex-wrap items-center gap-4">
                       <Link
                         href={`/mis-turnos/${booking.id}/reprogramar`}
-                        className="text-sm text-neutral-500 underline"
+                        className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
                       >
                         Reprogramar
                       </Link>

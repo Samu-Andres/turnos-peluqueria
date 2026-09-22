@@ -39,10 +39,10 @@ export function DaySchedule({ staffId }: { staffId: string }) {
             key={d}
             type="button"
             onClick={() => setDateStr(d)}
-            className={`shrink-0 whitespace-nowrap rounded-md border px-3 py-2 text-xs font-medium capitalize ${
+            className={`shrink-0 whitespace-nowrap rounded-lg border px-3 py-2 text-xs font-medium capitalize ${
               dateStr === d
-                ? "border-neutral-900 bg-neutral-900 text-white"
-                : "border-neutral-300"
+                ? "border-accent bg-accent text-accent-foreground"
+                : "border-border bg-surface hover:border-border-strong"
             }`}
           >
             {formatDateLongAR(d)}
@@ -51,19 +51,19 @@ export function DaySchedule({ staffId }: { staffId: string }) {
       </div>
 
       <div className="mt-4">
-        {isPending && <p className="text-sm text-neutral-500">Cargando...</p>}
+        {isPending && <p className="text-sm text-muted">Cargando...</p>}
 
         {!isPending && schedule && "error" in schedule && (
-          <p className="text-sm text-red-600">{schedule.error}</p>
+          <p className="text-sm text-red-400">{schedule.error}</p>
         )}
 
         {!isPending && schedule && !("error" in schedule) && !schedule.works && (
-          <p className="text-sm text-neutral-500">Ese día no trabaja.</p>
+          <p className="text-sm text-muted">Ese día no trabaja.</p>
         )}
 
         {!isPending && schedule && !("error" in schedule) && schedule.works && (
           <div className="flex flex-col gap-1">
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted">
               Trabaja de{" "}
               {schedule.workingRanges
                 .map((r) => `${r.start} a ${r.end}`)
@@ -72,7 +72,7 @@ export function DaySchedule({ staffId }: { staffId: string }) {
 
             <p className="mt-3 text-sm font-medium">Libre</p>
             {schedule.freeRanges.length === 0 ? (
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-muted">
                 Sin huecos libres ese día.
               </p>
             ) : (
@@ -80,7 +80,7 @@ export function DaySchedule({ staffId }: { staffId: string }) {
                 {schedule.freeRanges.map((r, i) => (
                   <span
                     key={i}
-                    className="rounded-md border border-green-200 bg-green-50 px-3 py-1 text-sm text-green-800"
+                    className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-sm text-emerald-400"
                   >
                     {r.start} a {r.end}
                   </span>
@@ -97,7 +97,7 @@ export function DaySchedule({ staffId }: { staffId: string }) {
               {schedule.bookings.map((b) => (
                 <li
                   key={b.id}
-                  className="flex items-center justify-between rounded-md border border-neutral-200 px-3 py-2 text-sm"
+                  className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2 text-sm"
                 >
                   <span>
                     {b.startTime} a {b.endTime} · {b.serviceName} ·{" "}

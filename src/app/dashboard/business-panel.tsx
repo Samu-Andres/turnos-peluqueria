@@ -21,12 +21,12 @@ export function BusinessPanel({ business }: { business: Business }) {
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="shrink-0 text-sm font-medium text-neutral-600 underline"
+          className="shrink-0 text-sm font-medium text-muted underline"
         >
           Editar
         </button>
       </div>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-muted">
         Tu página pública: <code>/{business.slug}</code>
       </p>
 
@@ -39,13 +39,13 @@ export function BusinessPanel({ business }: { business: Business }) {
       <div className="mt-8 flex flex-col gap-3">
         <Link
           href="/dashboard/servicios"
-          className="rounded-md border border-neutral-300 px-4 py-3 text-sm font-medium hover:bg-neutral-50"
+          className="rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:bg-surface-hover"
         >
           Servicios →
         </Link>
         <Link
           href="/dashboard/staff"
-          className="rounded-md border border-neutral-300 px-4 py-3 text-sm font-medium hover:bg-neutral-50"
+          className="rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:bg-surface-hover"
         >
           Staff →
         </Link>

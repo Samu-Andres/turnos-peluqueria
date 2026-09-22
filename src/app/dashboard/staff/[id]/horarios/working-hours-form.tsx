@@ -61,7 +61,7 @@ export function WorkingHoursForm({
       {DAY_LABELS.map((label, day) => (
         <div
           key={day}
-          className="flex flex-wrap items-center gap-3 rounded-md border border-neutral-200 px-4 py-3"
+          className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3"
         >
           <label className="flex w-32 items-center gap-2 text-sm font-medium">
             <input
@@ -79,22 +79,22 @@ export function WorkingHoursForm({
             name={`day_${day}_start`}
             value={days[day].start}
             onChange={(e) => updateDay(day, { start: e.target.value })}
-            className="rounded-md border border-neutral-300 px-2 py-1 text-sm"
+            className="rounded-lg border border-border bg-surface px-2 py-1 text-sm text-foreground focus:border-accent"
           />
-          <span className="text-sm text-neutral-400">a</span>
+          <span className="text-sm text-muted">a</span>
           <input
             type="time"
             name={`day_${day}_end`}
             value={days[day].end}
             onChange={(e) => updateDay(day, { end: e.target.value })}
-            className="rounded-md border border-neutral-300 px-2 py-1 text-sm"
+            className="rounded-lg border border-border bg-surface px-2 py-1 text-sm text-foreground focus:border-accent"
           />
 
           {day === 1 && (
             <button
               type="button"
               onClick={copyMondayToWeekdays}
-              className="ml-auto text-sm font-medium text-neutral-600 underline"
+              className="ml-auto text-sm font-medium text-muted underline"
             >
               Copiar a Martes–Viernes
             </button>
@@ -103,7 +103,7 @@ export function WorkingHoursForm({
       ))}
 
       {state.error && (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-sm text-red-400" role="alert">
           {state.error}
         </p>
       )}
@@ -111,7 +111,7 @@ export function WorkingHoursForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 self-start rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+        className="mt-2 self-start rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
       >
         {pending ? "Guardando..." : "Guardar horarios"}
       </button>

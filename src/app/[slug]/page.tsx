@@ -49,10 +49,10 @@ export default async function BusinessPage({ params }: { params: Params }) {
   const hasStaff = Boolean(staff && staff.length > 0);
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-6 py-12">
+    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
       <h1 className="text-3xl font-bold">{business.name}</h1>
       {(business.address || business.phone) && (
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-muted">
           {[business.address, business.phone].filter(Boolean).join(" · ")}
         </p>
       )}
@@ -64,7 +64,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
         <h2 className="text-lg font-semibold">Servicios</h2>
 
         {!hasStaff && (
-          <p className="mt-2 text-sm text-neutral-500">
+          <p className="mt-2 text-sm text-muted">
             Este negocio todavía no tiene turnos disponibles para reservar
             online.
           </p>
@@ -75,11 +75,11 @@ export default async function BusinessPage({ params }: { params: Params }) {
             {services.map((service) => (
               <li
                 key={service.id}
-                className="flex items-center justify-between gap-4 rounded-md border border-neutral-200 px-4 py-3"
+                className="flex items-center justify-between gap-4 rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-border-strong"
               >
                 <div>
                   <p className="font-medium">{service.name}</p>
-                  <p className="text-sm text-neutral-500">
+                  <p className="text-sm text-muted">
                     {service.duration_minutes} min ·{" "}
                     {formatPrice(service.price)}
                   </p>
@@ -87,7 +87,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
                 {hasStaff && (
                   <Link
                     href={`/${business.slug}/reservar?service=${service.id}`}
-                    className="shrink-0 rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white"
+                    className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover"
                   >
                     Reservar
                   </Link>
@@ -96,7 +96,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
             ))}
           </ul>
         ) : (
-          <p className="mt-2 text-sm text-neutral-500">
+          <p className="mt-2 text-sm text-muted">
             Todavía no hay servicios cargados.
           </p>
         )}

@@ -47,13 +47,13 @@ export default async function ReservarPage({
     ]);
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-6 py-12">
-      <Link href={`/${slug}`} className="text-sm text-neutral-500 underline">
+    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
+      <Link href={`/${slug}`} className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
         ← Volver a {business.name}
       </Link>
 
       <h1 className="mt-4 text-2xl font-bold">Reservar turno</h1>
-      <p className="mt-1 text-sm text-neutral-500">{business.name}</p>
+      <p className="mt-1 text-sm text-muted">{business.name}</p>
 
       {services && services.length > 0 && staff && staff.length > 0 ? (
         <BookingFlow
@@ -68,7 +68,7 @@ export default async function ReservarPage({
           isLoggedIn={Boolean(userData.user)}
         />
       ) : (
-        <p className="mt-8 text-sm text-neutral-500">
+        <p className="mt-8 text-sm text-muted">
           Este negocio todavía no tiene turnos disponibles para reservar
           online.
         </p>

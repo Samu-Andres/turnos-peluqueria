@@ -18,7 +18,7 @@ export function CancelOwnerBookingButton({ bookingId }: { bookingId: string }) {
               await ownerCancelBooking(bookingId);
             })
           }
-          className="text-sm font-medium text-red-600 underline disabled:opacity-60"
+          className="text-sm font-medium text-red-400 underline disabled:opacity-60"
         >
           Confirmar cancelación
         </button>
@@ -26,7 +26,7 @@ export function CancelOwnerBookingButton({ bookingId }: { bookingId: string }) {
           type="button"
           disabled={isPending}
           onClick={() => setConfirming(false)}
-          className="text-sm text-neutral-400 underline"
+          className="text-sm text-muted underline"
         >
           Volver
         </button>
@@ -38,7 +38,7 @@ export function CancelOwnerBookingButton({ bookingId }: { bookingId: string }) {
     <button
       type="button"
       onClick={() => setConfirming(true)}
-      className="text-sm text-neutral-500 underline"
+      className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
     >
       Cancelar turno
     </button>

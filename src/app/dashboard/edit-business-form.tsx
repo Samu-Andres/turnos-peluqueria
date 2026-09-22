@@ -18,7 +18,7 @@ export function EditBusinessForm({
   return (
     <div>
       <h1 className="text-2xl font-bold">Editar negocio</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-muted">
         Tu página pública sigue en <code>/{business.slug}</code>, eso no
         cambia aunque edites el nombre.
       </p>
@@ -34,7 +34,7 @@ export function EditBusinessForm({
             type="text"
             required
             defaultValue={business.name}
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
@@ -47,7 +47,7 @@ export function EditBusinessForm({
             name="address"
             type="text"
             defaultValue={business.address ?? ""}
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
@@ -60,7 +60,7 @@ export function EditBusinessForm({
             name="phone"
             type="tel"
             defaultValue={business.phone ?? ""}
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
@@ -73,12 +73,12 @@ export function EditBusinessForm({
             name="description"
             rows={2}
             defaultValue={business.description ?? ""}
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
         {state.error && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className="text-sm text-red-400" role="alert">
             {state.error}
           </p>
         )}
@@ -87,14 +87,14 @@ export function EditBusinessForm({
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {pending ? "Guardando..." : "Guardar cambios"}
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="text-sm text-neutral-500 underline"
+            className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
           >
             Cancelar
           </button>

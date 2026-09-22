@@ -32,15 +32,15 @@ export default async function DashboardPage() {
     .maybeSingle();
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-6 py-12">
-      <div className="mb-8 flex items-center justify-between">
-        <p className="text-sm text-neutral-500">
+    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted">
           Hola, {profile.full_name}
         </p>
         <form action={signOut}>
           <button
             type="submit"
-            className="text-sm font-medium text-neutral-500 underline"
+            className="text-sm font-medium text-muted underline"
           >
             Cerrar sesión
           </button>
