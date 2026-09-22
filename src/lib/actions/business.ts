@@ -89,6 +89,7 @@ export async function createBusiness(
   const address = String(formData.get("address") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const servesAtHome = formData.get("serves_at_home") === "on";
 
   if (!name) {
     return { error: "Poné un nombre para tu negocio." };
@@ -129,6 +130,7 @@ export async function createBusiness(
     phone: phone || null,
     description: description || null,
     logo_url: logoUrl,
+    serves_at_home: servesAtHome,
   });
 
   if (error) {
@@ -157,6 +159,7 @@ export async function updateBusiness(
   const address = String(formData.get("address") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const servesAtHome = formData.get("serves_at_home") === "on";
 
   if (!name) {
     return { error: "Poné un nombre para tu negocio." };
@@ -181,6 +184,7 @@ export async function updateBusiness(
       address: address || null,
       phone: phone || null,
       description: description || null,
+      serves_at_home: servesAtHome,
       ...(logoUrl ? { logo_url: logoUrl } : {}),
     })
     .eq("owner_id", user.id);

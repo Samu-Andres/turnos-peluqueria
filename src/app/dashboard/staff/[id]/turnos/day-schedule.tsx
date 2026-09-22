@@ -97,12 +97,17 @@ export function DaySchedule({ staffId }: { staffId: string }) {
               {schedule.bookings.map((b) => (
                 <li
                   key={b.id}
-                  className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+                  className="flex flex-col gap-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
                 >
                   <span>
                     {b.startTime} a {b.endTime} · {b.serviceName} ·{" "}
                     {b.clientName}
                   </span>
+                  {b.clientAddress && (
+                    <span className="text-xs text-accent">
+                      A domicilio: {b.clientAddress}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

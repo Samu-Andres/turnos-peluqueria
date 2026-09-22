@@ -20,6 +20,7 @@ export type StaffDayBooking = {
   status: BookingStatus;
   serviceName: string;
   clientName: string;
+  clientAddress: string | null;
 };
 
 type TimeRange = { start: string; end: string };
@@ -70,7 +71,7 @@ export async function getStaffDaySchedule(
 
   const { data: bookingsRaw } = await supabase
     .from("bookings")
-    .select("id, start_at, end_at, status, service_id, client_id")
+    .select("id, start_at, end_at, status, service_id, client_id, client_address")
     .eq("staff_id", staffId)
     .in("status", ["pending", "confirmed"])
     .gte("start_at", dayStart)
@@ -100,6 +101,7 @@ export async function getStaffDaySchedule(
     status: b.status,
     serviceName: serviceById.get(b.service_id) ?? "Servicio",
     clientName: clientById.get(b.client_id) ?? "Cliente",
+    clientAddress: b.client_address,
   }));
 
   if (!workingHours || workingHours.length === 0) {

@@ -66,6 +66,7 @@ export default async function ReservarPage({
           initialDateStr={query.date}
           initialTime={query.time}
           isLoggedIn={Boolean(userData.user)}
+          servesAtHome={business.serves_at_home}
         />
       ) : (
         <p className="mt-8 text-sm text-muted">
