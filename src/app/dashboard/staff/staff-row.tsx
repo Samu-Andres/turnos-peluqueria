@@ -20,6 +20,13 @@ export function StaffRow({ staff }: { staff: Staff }) {
 
       <div className="flex shrink-0 items-center gap-3">
         <Link
+          href={`/dashboard/staff/${staff.id}/turnos`}
+          className="text-sm font-medium text-neutral-600 underline"
+        >
+          Turnos
+        </Link>
+
+        <Link
           href={`/dashboard/staff/${staff.id}/horarios`}
           className="text-sm font-medium text-neutral-600 underline"
         >
