@@ -5,14 +5,8 @@ import { formatDateTimeLongAR, formatTimeAR } from "@/lib/booking/time";
 import { CancelOwnerBookingButton } from "./cancel-owner-booking-button";
 import { CompleteBookingButton } from "./complete-booking-button";
 import { DaySchedule } from "./day-schedule";
+import { STATUS_LABELS, statusBadgeClass } from "@/lib/booking/status-styles";
 import type { BookingStatus } from "@/types/database";
-
-const STATUS_LABELS: Record<BookingStatus, string> = {
-  pending: "Pendiente",
-  confirmed: "Confirmado",
-  cancelled: "Cancelado",
-  completed: "Completado",
-};
 
 type BookingRow = {
   id: string;
@@ -85,7 +79,7 @@ export default async function StaffTurnosPage({
     return (
       <li
         key={booking.id}
-        className="rounded-md border border-neutral-200 px-4 py-3"
+        className="rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-border-strong"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -93,21 +87,21 @@ export default async function StaffTurnosPage({
               {serviceById.get(booking.service_id) ?? "Servicio"} ·{" "}
               {clientById.get(booking.client_id) ?? "Cliente"}
             </p>
-            <p className="mt-1 text-sm capitalize text-neutral-500">
+            <p className="mt-1 text-sm capitalize text-muted">
               {formatDateTimeLongAR(booking.start_at)} a las{" "}
               {formatTimeAR(booking.start_at)}
             </p>
           </div>
-          <span className="shrink-0 rounded-full border border-neutral-300 px-2 py-1 text-xs font-medium text-neutral-600">
+          <span className={statusBadgeClass(booking.status)}>
             {STATUS_LABELS[booking.status]}
           </span>
         </div>
 
-        <div className="mt-3 flex items-center gap-4">
+        <div className="mt-3 flex flex-wrap items-center gap-4">
           {pastBooking && <CompleteBookingButton bookingId={booking.id} />}
           <Link
             href={`/dashboard/staff/${staffId}/turnos/${booking.id}/reprogramar`}
-            className="text-sm text-neutral-500 underline"
+            className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
           >
             Reprogramar
           </Link>
@@ -118,10 +112,10 @@ export default async function StaffTurnosPage({
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-6 py-12">
+    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
       <Link
         href="/dashboard/staff"
-        className="text-sm text-neutral-500 underline"
+        className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
       >
         ← Volver a staff
       </Link>
@@ -129,12 +123,12 @@ export default async function StaffTurnosPage({
       <h1 className="mt-4 text-2xl font-bold">Turnos de {staff.full_name}</h1>
 
       <section className="mt-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           Próximos turnos
         </h2>
 
         {upcoming.length === 0 ? (
-          <p className="mt-3 text-sm text-neutral-500">
+          <p className="mt-3 text-sm text-muted">
             No tiene turnos reservados todavía.
           </p>
         ) : (
@@ -146,10 +140,10 @@ export default async function StaffTurnosPage({
 
       {past.length > 0 && (
         <section className="mt-10">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
             Turnos pasados sin cerrar
           </h2>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm text-muted">
             Ya pasó la fecha y siguen como pendientes o confirmados. Marcalos
             como completados o cancelalos si no se presentaron.
           </p>
@@ -159,8 +153,8 @@ export default async function StaffTurnosPage({
         </section>
       )}
 
-      <section className="mt-10 border-t border-neutral-200 pt-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+      <section className="mt-10 border-t border-border pt-8">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           Disponibilidad por día
         </h2>
         <DaySchedule staffId={staffId} />

@@ -13,10 +13,10 @@ function LoginForm() {
   const next = searchParams.get("next");
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
+    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4 sm:px-6">
       <div>
         <h1 className="text-2xl font-bold">Iniciar sesión</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-muted">
           Entrá para reservar un turno o administrar tu negocio.
         </p>
       </div>
@@ -34,7 +34,7 @@ function LoginForm() {
             type="email"
             required
             autoComplete="email"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
@@ -48,12 +48,12 @@ function LoginForm() {
             type="password"
             required
             autoComplete="current-password"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
         {state.error && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className="text-sm text-red-400" role="alert">
             {state.error}
           </p>
         )}
@@ -61,17 +61,17 @@ function LoginForm() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
         >
           {pending ? "Entrando..." : "Entrar"}
         </button>
       </form>
 
-      <p className="text-center text-sm text-neutral-500">
+      <p className="text-center text-sm text-muted">
         ¿No tenés cuenta?{" "}
         <Link
           href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"}
-          className="font-medium text-neutral-900 underline"
+          className="font-medium text-accent underline decoration-accent/40 underline-offset-2 hover:text-accent-hover"
         >
           Registrate
         </Link>

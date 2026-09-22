@@ -14,10 +14,10 @@ function SignupForm() {
   const next = searchParams.get("next");
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
+    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4 sm:px-6">
       <div>
         <h1 className="text-2xl font-bold">Crear cuenta</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-muted">
           Elegí si vas a reservar turnos o si administrás una peluquería.
         </p>
       </div>
@@ -27,10 +27,10 @@ function SignupForm() {
 
         <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de cuenta">
           <label
-            className={`cursor-pointer rounded-md border px-3 py-2 text-center text-sm font-medium ${
+            className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm font-medium ${
               role === "client"
-                ? "border-neutral-900 bg-neutral-900 text-white"
-                : "border-neutral-300 text-neutral-700"
+                ? "border-accent bg-accent text-accent-foreground"
+                : "border-border text-muted"
             }`}
           >
             <input
@@ -45,10 +45,10 @@ function SignupForm() {
           </label>
 
           <label
-            className={`cursor-pointer rounded-md border px-3 py-2 text-center text-sm font-medium ${
+            className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm font-medium ${
               role === "owner"
-                ? "border-neutral-900 bg-neutral-900 text-white"
-                : "border-neutral-300 text-neutral-700"
+                ? "border-accent bg-accent text-accent-foreground"
+                : "border-border text-muted"
             }`}
           >
             <input
@@ -73,7 +73,7 @@ function SignupForm() {
             type="text"
             required
             autoComplete="name"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
@@ -87,7 +87,7 @@ function SignupForm() {
             type="email"
             required
             autoComplete="email"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
@@ -102,12 +102,12 @@ function SignupForm() {
             required
             minLength={6}
             autoComplete="new-password"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
         {state.error && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className="text-sm text-red-400" role="alert">
             {state.error}
           </p>
         )}
@@ -115,17 +115,17 @@ function SignupForm() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
         >
           {pending ? "Creando cuenta..." : "Crear cuenta"}
         </button>
       </form>
 
-      <p className="text-center text-sm text-neutral-500">
+      <p className="text-center text-sm text-muted">
         ¿Ya tenés cuenta?{" "}
         <Link
           href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
-          className="font-medium text-neutral-900 underline"
+          className="font-medium text-accent underline decoration-accent/40 underline-offset-2 hover:text-accent-hover"
         >
           Iniciá sesión
         </Link>

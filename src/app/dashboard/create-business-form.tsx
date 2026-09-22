@@ -11,7 +11,7 @@ export function CreateBusinessForm() {
   return (
     <div className="mx-auto max-w-sm">
       <h1 className="text-2xl font-bold">Creá tu negocio</h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-muted">
         Esto arma la página pública donde tus clientes van a poder reservar
         turnos.
       </p>
@@ -27,7 +27,7 @@ export function CreateBusinessForm() {
             type="text"
             required
             placeholder="Peluquería Andrea"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
@@ -39,7 +39,7 @@ export function CreateBusinessForm() {
             id="address"
             name="address"
             type="text"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
@@ -51,7 +51,7 @@ export function CreateBusinessForm() {
             id="phone"
             name="phone"
             type="tel"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
@@ -64,12 +64,12 @@ export function CreateBusinessForm() {
             name="description"
             rows={2}
             placeholder="Contales a tus clientes de qué se trata tu negocio"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
         {state.error && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className="text-sm text-red-400" role="alert">
             {state.error}
           </p>
         )}
@@ -77,7 +77,7 @@ export function CreateBusinessForm() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
         >
           {pending ? "Creando..." : "Crear negocio"}
         </button>

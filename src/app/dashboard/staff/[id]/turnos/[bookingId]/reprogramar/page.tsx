@@ -59,10 +59,10 @@ export default async function ReprogramarTurnoOwnerPage({
   )}`;
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-6 py-12">
+    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
       <Link
         href={`/dashboard/staff/${staffId}/turnos`}
-        className="text-sm text-neutral-500 underline"
+        className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
       >
         ← Volver a turnos de {staff.full_name}
       </Link>

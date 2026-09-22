@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #14120f;
+  --surface: #1d1a16;
+  --surface-hover: #262119;
+  --border: #342d23;
+  --border-strong: #4a4032;
+  --foreground: #f4ede1;
+  --muted: #a89a86;
+  --accent: #caa457;
+  --accent-hover: #b58f45;
+  --accent-foreground: #1a1410;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-heading: var(--font-oswald);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading), var(--font-sans), sans-serif;
+  letter-spacing: -0.01em;
+}
+
+code {
+  font-family: var(--font-mono), monospace;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  padding: 0.1em 0.45em;
+  font-size: 0.85em;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: var(--foreground);
 }

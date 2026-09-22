@@ -71,10 +71,10 @@ export function RescheduleFlow({
 
   return (
     <div className="mt-8 flex flex-col gap-6">
-      <p className="text-sm text-neutral-500">{summary}</p>
+      <p className="text-sm text-muted">{summary}</p>
 
       <div>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
           Nuevo día
         </h2>
         <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
@@ -86,10 +86,10 @@ export function RescheduleFlow({
                 setDateStr(d);
                 setTime(null);
               }}
-              className={`shrink-0 whitespace-nowrap rounded-md border px-3 py-2 text-xs font-medium capitalize ${
+              className={`shrink-0 whitespace-nowrap rounded-lg border px-3 py-2 text-xs font-medium capitalize ${
                 dateStr === d
-                  ? "border-neutral-900 bg-neutral-900 text-white"
-                  : "border-neutral-300"
+                  ? "border-accent bg-accent text-accent-foreground"
+                  : "border-border bg-surface hover:border-border-strong"
               }`}
             >
               {formatDateLongAR(d)}
@@ -100,20 +100,20 @@ export function RescheduleFlow({
 
       {dateStr && (
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
             Nuevo horario
           </h2>
 
           {isLoadingSlots && (
-            <p className="mt-3 text-sm text-neutral-500">Buscando horarios...</p>
+            <p className="mt-3 text-sm text-muted">Buscando horarios...</p>
           )}
 
           {!isLoadingSlots && slotsError && (
-            <p className="mt-3 text-sm text-red-600">{slotsError}</p>
+            <p className="mt-3 text-sm text-red-400">{slotsError}</p>
           )}
 
           {!isLoadingSlots && !slotsError && slots && slots.length === 0 && (
-            <p className="mt-3 text-sm text-neutral-500">
+            <p className="mt-3 text-sm text-muted">
               No hay horarios libres ese día, probá con otra fecha.
             </p>
           )}
@@ -125,10 +125,10 @@ export function RescheduleFlow({
                   key={slot}
                   type="button"
                   onClick={() => setTime(slot)}
-                  className={`rounded-md border px-3 py-2 text-sm font-medium ${
+                  className={`rounded-lg border px-3 py-2 text-sm font-medium ${
                     time === slot
-                      ? "border-neutral-900 bg-neutral-900 text-white"
-                      : "border-neutral-300"
+                      ? "border-accent bg-accent text-accent-foreground"
+                      : "border-border bg-surface hover:border-border-strong"
                   }`}
                 >
                   {slot}
@@ -145,7 +145,7 @@ export function RescheduleFlow({
           <input type="hidden" name="time" value={time} />
 
           {error && (
-            <p className="text-sm text-red-600" role="alert">
+            <p className="text-sm text-red-400" role="alert">
               {error}
             </p>
           )}
@@ -154,13 +154,13 @@ export function RescheduleFlow({
             <button
               type="submit"
               disabled={isSaving}
-              className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
             >
               {isSaving ? "Guardando..." : "Confirmar nuevo horario"}
             </button>
             <Link
               href={backHref}
-              className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-semibold text-neutral-900"
+              className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-accent hover:text-accent"
             >
               Cancelar
             </Link>

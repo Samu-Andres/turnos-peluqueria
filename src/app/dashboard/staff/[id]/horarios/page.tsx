@@ -32,10 +32,10 @@ export default async function StaffHorariosPage({
   const action = saveWorkingHours.bind(null, staffId);
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-6 py-12">
+    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
       <Link
         href="/dashboard/staff"
-        className="text-sm text-neutral-500 underline"
+        className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
       >
         ← Volver a staff
       </Link>
@@ -43,7 +43,7 @@ export default async function StaffHorariosPage({
       <h1 className="mt-4 text-2xl font-bold">
         Horarios de {staff.full_name}
       </h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-1 text-sm text-muted">
         Tildá los días que trabaja y definí el horario. Los clientes solo
         van a poder reservar turnos dentro de estos rangos.
       </p>

@@ -36,7 +36,7 @@ export function ServiceForm() {
           type="text"
           required
           placeholder="Corte de pelo"
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
         />
       </div>
 
@@ -53,7 +53,7 @@ export function ServiceForm() {
             step={5}
             required
             placeholder="30"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
 
@@ -69,7 +69,7 @@ export function ServiceForm() {
             step={0.01}
             required
             placeholder="5000"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
         </div>
       </div>
@@ -82,12 +82,12 @@ export function ServiceForm() {
           id="description"
           name="description"
           rows={2}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
         />
       </div>
 
       {state.error && (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-sm text-red-400" role="alert">
           {state.error}
         </p>
       )}
@@ -95,7 +95,7 @@ export function ServiceForm() {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
       >
         {pending ? "Guardando..." : "Agregar servicio"}
       </button>
