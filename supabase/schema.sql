@@ -279,3 +279,21 @@ $$;
 
 grant execute on function public.get_busy_intervals(uuid, timestamptz, timestamptz)
   to anon, authenticated;
+
+-- ---------------------------------------------------------------
+-- profiles: el dueño de un negocio también necesita poder ver el
+-- perfil (nombre) de los clientes que le reservaron un turno, para
+-- identificarlos en el panel de turnos. La policy original (cada
+-- usuario ve solo su propio perfil) se lo impedía; esta se suma
+-- (las policies de select son aditivas, se combinan con OR).
+-- ---------------------------------------------------------------
+create policy "profiles: el dueño ve clientes con turnos en su negocio"
+  on public.profiles for select
+  using (
+    exists (
+      select 1 from public.bookings
+      join public.businesses on businesses.id = bookings.business_id
+      where bookings.client_id = profiles.id
+        and businesses.owner_id = auth.uid()
+    )
+  );
