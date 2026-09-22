@@ -1,0 +1,205 @@
+/**
+ * Tipos de la base de datos, a mano, siguiendo el esquema de
+ * supabase/schema.sql.
+ *
+ * Cuando el proyecto de Supabase ya exista, conviene reemplazar este
+ * archivo por el generado automáticamente con:
+ *
+ *   npx supabase gen types typescript --project-id <tu-project-id> > src/types/database.ts
+ *
+ * así los tipos quedan sincronizados con el esquema real.
+ */
+
+export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
+export type ProfileRole = "owner" | "client";
+
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: {
+          id: string;
+          role: ProfileRole;
+          full_name: string;
+          phone: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          role?: ProfileRole;
+          full_name: string;
+          phone?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          role?: ProfileRole;
+          full_name?: string;
+          phone?: string | null;
+          created_at?: string;
+        };
+      };
+      businesses: {
+        Row: {
+          id: string;
+          owner_id: string;
+          name: string;
+          slug: string;
+          address: string | null;
+          phone: string | null;
+          description: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          owner_id: string;
+          name: string;
+          slug: string;
+          address?: string | null;
+          phone?: string | null;
+          description?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          owner_id?: string;
+          name?: string;
+          slug?: string;
+          address?: string | null;
+          phone?: string | null;
+          description?: string | null;
+          created_at?: string;
+        };
+      };
+      staff: {
+        Row: {
+          id: string;
+          business_id: string;
+          full_name: string;
+          photo_url: string | null;
+          active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          business_id: string;
+          full_name: string;
+          photo_url?: string | null;
+          active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          business_id?: string;
+          full_name?: string;
+          photo_url?: string | null;
+          active?: boolean;
+          created_at?: string;
+        };
+      };
+      services: {
+        Row: {
+          id: string;
+          business_id: string;
+          name: string;
+          description: string | null;
+          duration_minutes: number;
+          price: number;
+          active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          business_id: string;
+          name: string;
+          description?: string | null;
+          duration_minutes: number;
+          price: number;
+          active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          business_id?: string;
+          name?: string;
+          description?: string | null;
+          duration_minutes?: number;
+          price?: number;
+          active?: boolean;
+          created_at?: string;
+        };
+      };
+      working_hours: {
+        Row: {
+          id: string;
+          staff_id: string;
+          day_of_week: number;
+          start_time: string;
+          end_time: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          staff_id: string;
+          day_of_week: number;
+          start_time: string;
+          end_time: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          staff_id?: string;
+          day_of_week?: number;
+          start_time?: string;
+          end_time?: string;
+          created_at?: string;
+        };
+      };
+      bookings: {
+        Row: {
+          id: string;
+          business_id: string;
+          staff_id: string;
+          service_id: string;
+          client_id: string;
+          start_at: string;
+          end_at: string;
+          status: BookingStatus;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          business_id: string;
+          staff_id: string;
+          service_id: string;
+          client_id: string;
+          start_at: string;
+          end_at: string;
+          status?: BookingStatus;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          business_id?: string;
+          staff_id?: string;
+          service_id?: string;
+          client_id?: string;
+          start_at?: string;
+          end_at?: string;
+          status?: BookingStatus;
+          notes?: string | null;
+          created_at?: string;
+        };
+      };
+    };
+  };
+}
+
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type Business = Database["public"]["Tables"]["businesses"]["Row"];
+export type Staff = Database["public"]["Tables"]["staff"]["Row"];
+export type Service = Database["public"]["Tables"]["services"]["Row"];
+export type WorkingHours = Database["public"]["Tables"]["working_hours"]["Row"];
+export type Booking = Database["public"]["Tables"]["bookings"]["Row"];
