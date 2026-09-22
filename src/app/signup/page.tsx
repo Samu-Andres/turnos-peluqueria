@@ -10,6 +10,7 @@ const initialState: AuthFormState = { error: null };
 function SignupForm() {
   const [state, formAction, pending] = useActionState(signUp, initialState);
   const [role, setRole] = useState<"client" | "owner">("client");
+  const [businessType, setBusinessType] = useState<"local" | "domicilio">("local");
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
 
@@ -62,6 +63,51 @@ function SignupForm() {
             Dueño/a
           </label>
         </div>
+
+        {role === "owner" && (
+          <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface px-3 py-3">
+            <p className="text-sm font-medium">¿Tenés local o vas a domicilio?</p>
+            <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de negocio">
+              <label
+                className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm font-medium ${
+                  businessType === "local"
+                    ? "border-accent bg-accent text-accent-foreground"
+                    : "border-border text-muted"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="business_type"
+                  value="local"
+                  checked={businessType === "local"}
+                  onChange={() => setBusinessType("local")}
+                  className="sr-only"
+                />
+                Tengo local
+              </label>
+              <label
+                className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm font-medium ${
+                  businessType === "domicilio"
+                    ? "border-accent bg-accent text-accent-foreground"
+                    : "border-border text-muted"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="business_type"
+                  value="domicilio"
+                  checked={businessType === "domicilio"}
+                  onChange={() => setBusinessType("domicilio")}
+                  className="sr-only"
+                />
+                Voy a domicilio
+              </label>
+            </div>
+            <p className="text-xs text-muted">
+              Después lo podés cambiar cuando quieras desde tu panel.
+            </p>
+          </div>
+        )}
 
         <div className="flex flex-col gap-1">
           <label htmlFor="full_name" className="text-sm font-medium">

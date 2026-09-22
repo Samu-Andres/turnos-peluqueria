@@ -4,7 +4,12 @@ import { signOut } from "@/lib/actions/auth";
 import { BusinessPanel } from "./business-panel";
 import { CreateBusinessForm } from "./create-business-form";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tipo?: string }>;
+}) {
+  const { tipo } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -47,7 +52,11 @@ export default async function DashboardPage() {
         </form>
       </div>
 
-      {!business ? <CreateBusinessForm /> : <BusinessPanel business={business} />}
+      {!business ? (
+        <CreateBusinessForm defaultServesAtHome={tipo === "domicilio"} />
+      ) : (
+        <BusinessPanel business={business} />
+      )}
     </main>
   );
 }
