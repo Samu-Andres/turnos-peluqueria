@@ -105,6 +105,12 @@ export default async function StaffTurnosPage({
 
         <div className="mt-3 flex items-center gap-4">
           {pastBooking && <CompleteBookingButton bookingId={booking.id} />}
+          <Link
+            href={`/dashboard/staff/${staffId}/turnos/${booking.id}/reprogramar`}
+            className="text-sm text-neutral-500 underline"
+          >
+            Reprogramar
+          </Link>
           <CancelOwnerBookingButton bookingId={booking.id} />
         </div>
       </li>
