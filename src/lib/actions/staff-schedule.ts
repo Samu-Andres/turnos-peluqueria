@@ -143,3 +143,15 @@ export async function ownerCancelBooking(bookingId: string): Promise<void> {
 
   revalidatePath("/dashboard/staff/[id]/turnos", "page");
 }
+
+export async function markBookingCompleted(bookingId: string): Promise<void> {
+  const { supabase, business } = await requireOwnerBusiness();
+
+  await supabase
+    .from("bookings")
+    .update({ status: "completed" })
+    .eq("id", bookingId)
+    .eq("business_id", business.id);
+
+  revalidatePath("/dashboard/staff/[id]/turnos", "page");
+}
