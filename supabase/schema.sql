@@ -58,6 +58,7 @@ create table public.businesses (
   phone text,
   description text,
   logo_url text,
+  serves_at_home boolean not null default false,
   created_at timestamptz not null default now()
 );
 
@@ -203,6 +204,7 @@ create table public.bookings (
   status text not null default 'pending'
     check (status in ('pending', 'confirmed', 'cancelled', 'completed')),
   notes text,
+  client_address text,
   created_at timestamptz not null default now()
 );
 
@@ -345,3 +347,18 @@ create policy "logos: el dueño borra su logo"
     bucket_id = 'logos'
     and (storage.foldername(name))[1] = auth.uid()::text
   );
+
+-- ---------------------------------------------------------------
+-- Atender a domicilio: un negocio sin local fijo (ej. un barbero
+-- que trabaja solo y va a la casa del cliente) se marca con
+-- serves_at_home = true. En ese caso la página pública muestra un
+-- aviso en vez de (o además de) la dirección del negocio, y el
+-- flujo de reserva le pide al cliente SU dirección, que queda
+-- guardada en el turno (bookings.client_address) para que el dueño
+-- sepa adónde ir.
+-- ---------------------------------------------------------------
+alter table public.businesses
+  add column if not exists serves_at_home boolean not null default false;
+
+alter table public.bookings
+  add column if not exists client_address text;

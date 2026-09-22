@@ -29,6 +29,7 @@ export function BookingFlow({
   initialDateStr,
   initialTime,
   isLoggedIn,
+  servesAtHome,
 }: {
   slug: string;
   businessId: string;
@@ -39,6 +40,7 @@ export function BookingFlow({
   initialDateStr?: string;
   initialTime?: string;
   isLoggedIn: boolean;
+  servesAtHome: boolean;
 }) {
   const [serviceId, setServiceId] = useState<string | null>(() =>
     initialServiceId && services.some((s) => s.id === initialServiceId)
@@ -224,6 +226,7 @@ export function BookingFlow({
           dateStr={dateStr}
           time={time}
           isLoggedIn={isLoggedIn}
+          servesAtHome={servesAtHome}
           action={boundCreateBooking}
         />
       )}
@@ -238,6 +241,7 @@ function ConfirmStep({
   dateStr,
   time,
   isLoggedIn,
+  servesAtHome,
   action,
 }: {
   slug: string;
@@ -246,6 +250,7 @@ function ConfirmStep({
   dateStr: string;
   time: string;
   isLoggedIn: boolean;
+  servesAtHome: boolean;
   action: BoundBookingAction;
 }) {
   const [state, formAction, pending] = useActionState(action, initialBookingState);
@@ -281,6 +286,26 @@ function ConfirmStep({
         <form action={formAction} className="mt-4 flex flex-col gap-3">
           <input type="hidden" name="date" value={dateStr} />
           <input type="hidden" name="time" value={time} />
+
+          {servesAtHome && (
+            <div className="flex flex-col gap-1">
+              <label htmlFor="client_address" className="text-sm font-medium">
+                Tu dirección
+              </label>
+              <input
+                id="client_address"
+                name="client_address"
+                type="text"
+                required
+                placeholder="Calle, número, piso/depto, barrio"
+                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+              />
+              <p className="text-xs text-muted">
+                Este negocio atiende a domicilio: necesitamos tu dirección
+                para ir a cortarte el pelo.
+              </p>
+            </div>
+          )}
 
           <div className="flex flex-col gap-1">
             <label htmlFor="notes" className="text-sm font-medium">

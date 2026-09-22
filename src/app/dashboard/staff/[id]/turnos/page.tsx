@@ -15,6 +15,7 @@ type BookingRow = {
   status: BookingStatus;
   service_id: string;
   client_id: string;
+  client_address: string | null;
 };
 
 export default async function StaffTurnosPage({
@@ -41,14 +42,14 @@ export default async function StaffTurnosPage({
   const [{ data: upcomingRaw }, { data: pastRaw }] = await Promise.all([
     supabase
       .from("bookings")
-      .select("id, start_at, end_at, status, service_id, client_id")
+      .select("id, start_at, end_at, status, service_id, client_id, client_address")
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
       .gte("start_at", nowISO)
       .order("start_at", { ascending: true }),
     supabase
       .from("bookings")
-      .select("id, start_at, end_at, status, service_id, client_id")
+      .select("id, start_at, end_at, status, service_id, client_id, client_address")
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
       .lt("start_at", nowISO)
@@ -91,6 +92,11 @@ export default async function StaffTurnosPage({
               {formatDateTimeLongAR(booking.start_at)} a las{" "}
               {formatTimeAR(booking.start_at)}
             </p>
+            {booking.client_address && (
+              <p className="mt-1 text-sm text-accent">
+                A domicilio: {booking.client_address}
+              </p>
+            )}
           </div>
           <span className={statusBadgeClass(booking.status)}>
             {STATUS_LABELS[booking.status]}

@@ -133,12 +133,13 @@ export async function createBooking(
   const dateStr = String(formData.get("date") ?? "").trim();
   const timeStr = String(formData.get("time") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim();
+  const clientAddress = String(formData.get("client_address") ?? "").trim();
 
   if (!dateStr || !timeStr) {
     return { error: "Elegí una fecha y un horario." };
   }
 
-  const [{ data: service }, { data: staff }] = await Promise.all([
+  const [{ data: service }, { data: staff }, { data: business }] = await Promise.all([
     supabase
       .from("services")
       .select("*")
@@ -153,10 +154,21 @@ export async function createBooking(
       .eq("business_id", businessId)
       .eq("active", true)
       .maybeSingle(),
+    supabase
+      .from("businesses")
+      .select("serves_at_home")
+      .eq("id", businessId)
+      .maybeSingle(),
   ]);
 
   if (!service || !staff) {
     return { error: "Ese servicio o esa persona ya no están disponibles." };
+  }
+
+  if (business?.serves_at_home && !clientAddress) {
+    return {
+      error: "Este negocio atiende a domicilio: contanos tu dirección.",
+    };
   }
 
   // Recalculamos disponibilidad server-side antes de reservar, para no
@@ -182,6 +194,7 @@ export async function createBooking(
     end_at: endAt,
     status: "confirmed",
     notes: notes || null,
+    client_address: business?.serves_at_home ? clientAddress : null,
   });
 
   if (error) {

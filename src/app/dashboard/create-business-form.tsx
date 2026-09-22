@@ -46,6 +46,22 @@ export function CreateBusinessForm() {
           />
         </div>
 
+        <label className="flex items-start gap-2 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm">
+          <input
+            type="checkbox"
+            name="serves_at_home"
+            defaultChecked={false}
+            className="mt-0.5 h-4 w-4 accent-accent"
+          />
+          <span>
+            <span className="font-medium">Atiendo a domicilio</span>
+            <span className="block text-xs text-muted">
+              Marcalo si trabajás solo/a y vas a la casa de tus clientes (sin
+              local fijo). Les vamos a pedir su dirección al reservar.
+            </span>
+          </span>
+        </label>
+
         <div className="flex flex-col gap-1">
           <label htmlFor="phone" className="text-sm font-medium">
             Teléfono (opcional)

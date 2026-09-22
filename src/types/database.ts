@@ -50,6 +50,7 @@ export interface Database {
           phone: string | null;
           description: string | null;
           logo_url: string | null;
+          serves_at_home: boolean;
           created_at: string;
         };
         Insert: {
@@ -61,6 +62,7 @@ export interface Database {
           phone?: string | null;
           description?: string | null;
           logo_url?: string | null;
+          serves_at_home?: boolean;
           created_at?: string;
         };
         Update: {
@@ -72,6 +74,7 @@ export interface Database {
           phone?: string | null;
           description?: string | null;
           logo_url?: string | null;
+          serves_at_home?: boolean;
           created_at?: string;
         };
         Relationships: [];
@@ -174,6 +177,7 @@ export interface Database {
           end_at: string;
           status: BookingStatus;
           notes: string | null;
+          client_address: string | null;
           created_at: string;
         };
         Insert: {
@@ -186,6 +190,7 @@ export interface Database {
           end_at: string;
           status?: BookingStatus;
           notes?: string | null;
+          client_address?: string | null;
           created_at?: string;
         };
         Update: {
@@ -198,6 +203,7 @@ export interface Database {
           end_at?: string;
           status?: BookingStatus;
           notes?: string | null;
+          client_address?: string | null;
           created_at?: string;
         };
         Relationships: [];

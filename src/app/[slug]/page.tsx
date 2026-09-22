@@ -66,6 +66,11 @@ export default async function BusinessPage({ params }: { params: Params }) {
               {[business.address, business.phone].filter(Boolean).join(" · ")}
             </p>
           )}
+          {business.serves_at_home && (
+            <span className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
+              Atiende a domicilio
+            </span>
+          )}
         </div>
       </div>
       {business.description && (

@@ -93,6 +93,11 @@ export default async function MisTurnosPage({
                         {formatTimeAR(booking.start_at)}
                         {staffMember && ` · con ${staffMember.full_name}`}
                       </p>
+                      {booking.client_address && (
+                        <p className="mt-1 text-sm text-accent">
+                          Turno a domicilio en: {booking.client_address}
+                        </p>
+                      )}
                     </div>
                     <span className={statusBadgeClass(booking.status)}>
                       {STATUS_LABELS[booking.status]}
