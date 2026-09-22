@@ -6,7 +6,11 @@ import { LogoField } from "@/components/logo-field";
 
 const initialState: BusinessFormState = { error: null };
 
-export function CreateBusinessForm() {
+export function CreateBusinessForm({
+  defaultServesAtHome = false,
+}: {
+  defaultServesAtHome?: boolean;
+}) {
   const [state, formAction, pending] = useActionState(createBusiness, initialState);
 
   return (
@@ -50,7 +54,7 @@ export function CreateBusinessForm() {
           <input
             type="checkbox"
             name="serves_at_home"
-            defaultChecked={false}
+            defaultChecked={defaultServesAtHome}
             className="mt-0.5 h-4 w-4 accent-accent"
           />
           <span>

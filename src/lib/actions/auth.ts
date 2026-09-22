@@ -12,6 +12,10 @@ function readRole(value: FormDataEntryValue | null): ProfileRole {
   return value === "owner" ? "owner" : "client";
 }
 
+function readBusinessType(value: FormDataEntryValue | null): "local" | "domicilio" {
+  return value === "domicilio" ? "domicilio" : "local";
+}
+
 /**
  * Lee el campo "next" del form y lo valida como un path relativo seguro
  * (nunca una URL absoluta ni protocol-relative), para evitar mandar al
@@ -38,6 +42,7 @@ export async function signUp(
   const password = String(formData.get("password") ?? "");
   const fullName = String(formData.get("full_name") ?? "").trim();
   const role = readRole(formData.get("role"));
+  const businessType = readBusinessType(formData.get("business_type"));
   const next = safeNextPath(formData.get("next"));
 
   if (!email || !password || !fullName) {
@@ -60,17 +65,26 @@ export async function signUp(
     return { error: error.message };
   }
 
+  // A un/a dueño/a le preguntamos, ya en el signup, si tiene local o
+  // trabaja a domicilio. Esa elección todavía no se puede guardar en
+  // ningún lado (el negocio ni existe), así que viaja como query param
+  // hasta /dashboard, donde el formulario de "crear negocio" la usa para
+  // dejar "Atiendo a domicilio" tildado de entrada.
+  const ownerNext =
+    role === "owner" ? `/dashboard?tipo=${businessType}` : "/";
+  const effectiveNext = next ?? ownerNext;
+
   // Si el proyecto de Supabase tiene "Confirm email" activado, signUp no
   // devuelve sesión hasta que el usuario confirma desde el mail. El "next"
   // no sobrevive ese viaje por mail de forma confiable, así que lo
   // llevamos como query param hasta la pantalla de "revisá tu email", que
   // a su vez se lo pasa al login: ahí sí se termina de respetar.
   if (!data.session) {
-    const query = next ? `?next=${encodeURIComponent(next)}` : "";
+    const query = `?next=${encodeURIComponent(effectiveNext)}`;
     redirect(`/signup/revisa-tu-email${query}`);
   }
 
-  redirect(next ?? (role === "owner" ? "/dashboard" : "/"));
+  redirect(effectiveNext);
 }
 
 export async function signIn(
