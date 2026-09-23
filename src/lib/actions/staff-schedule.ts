@@ -1,7 +1,9 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
+import { createClient } from "@/lib/supabase/server";
+import { requireStaffAccess } from "@/lib/dashboard/require-staff-access";
 import {
   addDaysToDateStr,
   combineDateAndTimeToISO,
@@ -39,25 +41,14 @@ export type StaffDaySchedule =
 
 /**
  * Trae, para un día puntual, en qué horario trabaja esa persona, qué
- * turnos ya tiene y qué huecos le quedan libres. Solo lo puede pedir el
- * dueño del negocio (vía requireOwnerBusiness).
+ * turnos ya tiene y qué huecos le quedan libres. Lo puede pedir el
+ * dueño del negocio o la propia persona (vía requireStaffAccess).
  */
 export async function getStaffDaySchedule(
   staffId: string,
   dateStr: string
 ): Promise<StaffDaySchedule> {
-  const { supabase, business } = await requireOwnerBusiness();
-
-  const { data: staff } = await supabase
-    .from("staff")
-    .select("id")
-    .eq("id", staffId)
-    .eq("business_id", business.id)
-    .maybeSingle();
-
-  if (!staff) {
-    return { error: "No encontramos a esa persona en tu negocio." };
-  }
+  const { supabase } = await requireStaffAccess(staffId);
 
   const day = dayOfWeekOf(dateStr);
 
@@ -131,39 +122,92 @@ export async function getStaffDaySchedule(
   };
 }
 
+// Estas tres acciones ya no pasan por requireOwnerBusiness (que exige
+// tener un negocio propio): las puede llamar tanto el dueño del negocio
+// como la propia persona asignada al turno (si tiene cuenta de staff).
+// OJO: a diferencia de RLS (que también deja pasar al cliente dueño del
+// turno, para que pueda cancelarlo desde "Mis turnos"), acá el cliente
+// NO tiene que poder confirmar/completar/cancelar su propio turno desde
+// este lado "de negocio" — por eso se valida acá, explícitamente, quién
+// llama, en vez de confiar en que la policy de bookings alcance sola.
+async function requireOwnerOrAssignedStaff(bookingId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: booking } = await supabase
+    .from("bookings")
+    .select("id, business_id, staff_id")
+    .eq("id", bookingId)
+    .maybeSingle();
+
+  if (!booking) {
+    return null;
+  }
+
+  const [{ data: business }, { data: staff }] = await Promise.all([
+    supabase
+      .from("businesses")
+      .select("owner_id")
+      .eq("id", booking.business_id)
+      .maybeSingle(),
+    supabase
+      .from("staff")
+      .select("user_id")
+      .eq("id", booking.staff_id)
+      .maybeSingle(),
+  ]);
+
+  const isAuthorized =
+    business?.owner_id === user.id || staff?.user_id === user.id;
+
+  return isAuthorized ? supabase : null;
+}
+
+function revalidateStaffTurnos() {
+  revalidatePath("/dashboard/staff/[id]/turnos", "page");
+  revalidatePath("/staff/turnos");
+}
+
 export async function confirmBooking(bookingId: string): Promise<void> {
-  const { supabase, business } = await requireOwnerBusiness();
+  const supabase = await requireOwnerOrAssignedStaff(bookingId);
+  if (!supabase) return;
 
   await supabase
     .from("bookings")
     .update({ status: "confirmed" })
     .eq("id", bookingId)
-    .eq("business_id", business.id)
     .eq("status", "pending");
 
-  revalidatePath("/dashboard/staff/[id]/turnos", "page");
+  revalidateStaffTurnos();
 }
 
 export async function ownerCancelBooking(bookingId: string): Promise<void> {
-  const { supabase, business } = await requireOwnerBusiness();
+  const supabase = await requireOwnerOrAssignedStaff(bookingId);
+  if (!supabase) return;
 
   await supabase
     .from("bookings")
     .update({ status: "cancelled" })
-    .eq("id", bookingId)
-    .eq("business_id", business.id);
+    .eq("id", bookingId);
 
-  revalidatePath("/dashboard/staff/[id]/turnos", "page");
+  revalidateStaffTurnos();
 }
 
 export async function markBookingCompleted(bookingId: string): Promise<void> {
-  const { supabase, business } = await requireOwnerBusiness();
+  const supabase = await requireOwnerOrAssignedStaff(bookingId);
+  if (!supabase) return;
 
   await supabase
     .from("bookings")
     .update({ status: "completed" })
-    .eq("id", bookingId)
-    .eq("business_id", business.id);
+    .eq("id", bookingId);
 
-  revalidatePath("/dashboard/staff/[id]/turnos", "page");
+  revalidateStaffTurnos();
 }

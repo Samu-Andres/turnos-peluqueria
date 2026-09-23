@@ -8,7 +8,7 @@
 -- ---------------------------------------------------------------
 create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
-  role text not null default 'client' check (role in ('owner', 'client')),
+  role text not null default 'client' check (role in ('owner', 'client', 'staff')),
   full_name text not null,
   phone text,
   created_at timestamptz not null default now()
@@ -89,6 +89,13 @@ create table public.staff (
   full_name text not null,
   photo_url text,
   active boolean not null default true,
+  -- email/user_id solo se usan para negocios con local (serves_at_home =
+  -- false): ahí cada persona tiene su propia cuenta, creada por
+  -- supabase.auth.admin.inviteUserByEmail() desde createStaff() (ver
+  -- src/lib/actions/staff.ts). Para negocios a domicilio (sin local)
+  -- quedan null: no hace falta cuenta propia.
+  email text,
+  user_id uuid references auth.users (id) on delete set null,
   created_at timestamptz not null default now()
 );
 
@@ -114,6 +121,8 @@ create policy "staff: el dueño del negocio administra su staff"
         and businesses.owner_id = auth.uid()
     )
   );
+
+create unique index staff_user_id_key on public.staff (user_id) where user_id is not null;
 
 -- ---------------------------------------------------------------
 -- services: servicios que ofrece el negocio (corte, color, etc.)
@@ -190,6 +199,25 @@ create policy "working_hours: el dueño del negocio administra los horarios"
     )
   );
 
+-- Además del dueño, la propia persona (si tiene cuenta de staff) puede
+-- administrar su propio horario.
+create policy "working_hours: el propio staff administra su horario"
+  on public.working_hours for all
+  using (
+    exists (
+      select 1 from public.staff
+      where staff.id = working_hours.staff_id
+        and staff.user_id = auth.uid()
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.staff
+      where staff.id = working_hours.staff_id
+        and staff.user_id = auth.uid()
+    )
+  );
+
 -- ---------------------------------------------------------------
 -- bookings: turnos reservados por un cliente
 -- ---------------------------------------------------------------
@@ -252,6 +280,29 @@ create policy "bookings: cliente o dueño actualizan (ej. cancelar/confirmar)"
       select 1 from public.businesses
       where businesses.id = bookings.business_id
         and businesses.owner_id = auth.uid()
+    )
+  );
+
+-- Además del dueño, la propia persona asignada al turno (si tiene
+-- cuenta de staff) puede verlo y actualizarlo (confirmar, cancelar,
+-- marcar completado, reprogramar).
+create policy "bookings: el propio staff ve sus turnos asignados"
+  on public.bookings for select
+  using (
+    exists (
+      select 1 from public.staff
+      where staff.id = bookings.staff_id
+        and staff.user_id = auth.uid()
+    )
+  );
+
+create policy "bookings: el propio staff actualiza sus turnos asignados"
+  on public.bookings for update
+  using (
+    exists (
+      select 1 from public.staff
+      where staff.id = bookings.staff_id
+        and staff.user_id = auth.uid()
     )
   );
 
@@ -526,3 +577,59 @@ alter table public.bookings
 
 create unique index if not exists bookings_manage_token_key on public.bookings (manage_token);
 
+-- ---------------------------------------------------------------
+-- Cuentas de staff por invitación (solo negocios con local propio):
+-- cada staff puede tener una cuenta vinculada (user_id) para entrar a
+-- ver y manejar sus propios turnos y horarios, sin depender del dueño.
+-- Para una base ya existente, sumar todo esto sin romper nada:
+-- ---------------------------------------------------------------
+alter table public.profiles drop constraint if exists profiles_role_check;
+alter table public.profiles
+  add constraint profiles_role_check check (role in ('owner', 'client', 'staff'));
+
+alter table public.staff add column if not exists email text;
+alter table public.staff
+  add column if not exists user_id uuid references auth.users (id) on delete set null;
+
+create unique index if not exists staff_user_id_key
+  on public.staff (user_id) where user_id is not null;
+
+drop policy if exists "working_hours: el propio staff administra su horario" on public.working_hours;
+create policy "working_hours: el propio staff administra su horario"
+  on public.working_hours for all
+  using (
+    exists (
+      select 1 from public.staff
+      where staff.id = working_hours.staff_id
+        and staff.user_id = auth.uid()
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.staff
+      where staff.id = working_hours.staff_id
+        and staff.user_id = auth.uid()
+    )
+  );
+
+drop policy if exists "bookings: el propio staff ve sus turnos asignados" on public.bookings;
+create policy "bookings: el propio staff ve sus turnos asignados"
+  on public.bookings for select
+  using (
+    exists (
+      select 1 from public.staff
+      where staff.id = bookings.staff_id
+        and staff.user_id = auth.uid()
+    )
+  );
+
+drop policy if exists "bookings: el propio staff actualiza sus turnos asignados" on public.bookings;
+create policy "bookings: el propio staff actualiza sus turnos asignados"
+  on public.bookings for update
+  using (
+    exists (
+      select 1 from public.staff
+      where staff.id = bookings.staff_id
+        and staff.user_id = auth.uid()
+    )
+  );

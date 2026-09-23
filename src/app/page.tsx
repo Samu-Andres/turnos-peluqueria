@@ -9,7 +9,7 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let role: "owner" | "client" | null = null;
+  let role: "owner" | "client" | "staff" | null = null;
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
@@ -92,6 +92,15 @@ export default async function Home() {
               className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover"
             >
               Mis turnos
+            </Link>
+          )}
+
+          {user && role === "staff" && (
+            <Link
+              href="/staff"
+              className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover"
+            >
+              Tus turnos
             </Link>
           )}
 

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
 import { saveWorkingHours } from "@/lib/actions/working-hours";
-import { WorkingHoursForm } from "./working-hours-form";
+import { WorkingHoursForm } from "@/components/working-hours-form";
 
 export default async function StaffHorariosPage({
   params,

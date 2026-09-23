@@ -2,7 +2,6 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
 import { combineDateAndTimeToISO } from "@/lib/booking/time";
 import { getAvailableSlots } from "@/lib/actions/booking-flow";
 
@@ -96,25 +95,58 @@ export async function rescheduleBookingAsClient(
 }
 
 /**
- * El dueño reprograma un turno de su negocio.
+ * El dueño o la propia persona asignada (si tiene cuenta de staff)
+ * reprograman un turno "del lado del negocio". Igual que en
+ * staff-schedule.ts, se valida explícitamente quién llama en vez de
+ * apoyarse en la policy de bookings: esa policy también deja pasar al
+ * cliente dueño del turno (para "Mis turnos"), pero acá no queremos
+ * que el cliente pueda reprogramar por esta vía paralela.
  */
 export async function rescheduleBookingAsOwner(
   bookingId: string,
   _prevState: RescheduleFormState,
   formData: FormData
 ): Promise<RescheduleFormState> {
-  const { supabase, business } = await requireOwnerBusiness();
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Iniciá sesión para reprogramar el turno." };
+  }
 
   const { data: booking } = await supabase
     .from("bookings")
     .select("*")
     .eq("id", bookingId)
-    .eq("business_id", business.id)
     .maybeSingle();
 
   if (!booking) {
     return { error: "No encontramos ese turno." };
   }
+
+  const [{ data: business }, { data: staff }] = await Promise.all([
+    supabase
+      .from("businesses")
+      .select("owner_id")
+      .eq("id", booking.business_id)
+      .maybeSingle(),
+    supabase
+      .from("staff")
+      .select("user_id")
+      .eq("id", booking.staff_id)
+      .maybeSingle(),
+  ]);
+
+  const isOwner = business?.owner_id === user.id;
+  const isAssignedStaff = staff?.user_id === user.id;
+
+  if (!isOwner && !isAssignedStaff) {
+    return { error: "No encontramos ese turno." };
+  }
+
   if (booking.status !== "pending" && booking.status !== "confirmed") {
     return { error: "Ese turno ya no se puede reprogramar." };
   }
@@ -161,5 +193,11 @@ export async function rescheduleBookingAsOwner(
     return { error: error.message };
   }
 
-  redirect(`/dashboard/staff/${booking.staff_id}/turnos?reprogramado=1`);
+  // El dueño vuelve al listado de turnos de ese staff; la propia
+  // persona (si fue quien reprogramó) vuelve a su propio listado.
+  redirect(
+    isOwner
+      ? `/dashboard/staff/${booking.staff_id}/turnos?reprogramado=1`
+      : "/staff/turnos?reprogramado=1"
+  );
 }

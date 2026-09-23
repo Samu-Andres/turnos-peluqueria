@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
+import { requireStaffAccess } from "@/lib/dashboard/require-staff-access";
 import { DAY_LABELS } from "@/lib/dashboard/days";
 
 export type WorkingHoursFormState = {
@@ -15,18 +15,7 @@ export async function saveWorkingHours(
   _prevState: WorkingHoursFormState,
   formData: FormData
 ): Promise<WorkingHoursFormState> {
-  const { supabase, business } = await requireOwnerBusiness();
-
-  const { data: staff } = await supabase
-    .from("staff")
-    .select("id")
-    .eq("id", staffId)
-    .eq("business_id", business.id)
-    .maybeSingle();
-
-  if (!staff) {
-    return { error: "No encontramos a esa persona en tu negocio." };
-  }
+  const { supabase } = await requireStaffAccess(staffId);
 
   const rows: {
     staff_id: string;
@@ -77,5 +66,6 @@ export async function saveWorkingHours(
   }
 
   revalidatePath(`/dashboard/staff/${staffId}/horarios`);
+  revalidatePath("/staff/horarios");
   return { error: null };
 }
