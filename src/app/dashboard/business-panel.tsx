@@ -1,12 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { EditBusinessForm } from "./edit-business-form";
 import type { Business } from "@/types/database";
 
+// No hay nada a lo que suscribirse: solo usamos useSyncExternalStore para
+// leer window.location.origin de forma segura con SSR (en el server no
+// existe window, así que ahí devolvemos null y mostramos la ruta relativa
+// hasta que el cliente hidrata con el origin real).
+function subscribeNoop() {
+  return () => {};
+}
+
+function getOrigin() {
+  return window.location.origin;
+}
+
+function getServerOrigin() {
+  return null;
+}
+
 export function BusinessPanel({ business }: { business: Business }) {
   const [editing, setEditing] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const origin = useSyncExternalStore(subscribeNoop, getOrigin, getServerOrigin);
+  const publicUrl = origin ? `${origin}/${business.slug}` : `/${business.slug}`;
+
+  async function handleCopyUrl() {
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // el navegador bloqueó el portapapeles; no rompemos nada por esto
+    }
+  }
 
   if (editing) {
     return (
@@ -36,9 +65,18 @@ export function BusinessPanel({ business }: { business: Business }) {
           Editar
         </button>
       </div>
-      <p className="mt-1 text-sm text-muted">
-        Tu página pública: <code>/{business.slug}</code>
-      </p>
+      <div className="mt-1 flex flex-wrap items-center gap-2">
+        <p className="text-sm text-muted">
+          Tu página pública: <code>{publicUrl}</code>
+        </p>
+        <button
+          type="button"
+          onClick={handleCopyUrl}
+          className="shrink-0 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted transition-colors hover:border-accent hover:text-accent"
+        >
+          {copied ? "¡Copiado!" : "Copiar"}
+        </button>
+      </div>
 
       {business.description && (
         <p className="mt-3 text-sm">{business.description}</p>
