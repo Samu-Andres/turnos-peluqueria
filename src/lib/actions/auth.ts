@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteOrigin } from "@/lib/site-url";
 import type { ProfileRole } from "@/types/database";
 
 export type AuthFormState = {
@@ -126,4 +127,74 @@ export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+
+/**
+ * Pide el mail de recuperación de contraseña. Por seguridad, siempre
+ * termina en la misma pantalla de "revisá tu email" exista o no ese
+ * mail registrado (así no se puede usar este form para averiguar qué
+ * emails están dados de alta).
+ */
+export async function requestPasswordReset(
+  _prevState: AuthFormState,
+  formData: FormData
+): Promise<AuthFormState> {
+  const email = String(formData.get("email") ?? "").trim();
+
+  if (!email) {
+    return { error: "Poné tu email." };
+  }
+
+  const supabase = await createClient();
+  const origin = await getSiteOrigin();
+
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent("/reset-password")}`,
+  });
+
+  redirect("/recuperar-password/revisa-tu-email");
+}
+
+/**
+ * Define la nueva contraseña. Solo funciona si hay una sesión de
+ * recuperación activa (la crea /auth/confirm al verificar el link que
+ * mandó requestPasswordReset).
+ */
+export async function updatePassword(
+  _prevState: AuthFormState,
+  formData: FormData
+): Promise<AuthFormState> {
+  const password = String(formData.get("password") ?? "");
+
+  if (password.length < 6) {
+    return { error: "La contraseña tiene que tener al menos 6 caracteres." };
+  }
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      error:
+        "El link expiró o no es válido. Pedí uno nuevo desde 'Olvidé mi contraseña'.",
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  redirect(profile?.role === "owner" ? "/dashboard" : "/");
 }

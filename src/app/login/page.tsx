@@ -39,9 +39,17 @@ function LoginForm() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="password" className="text-sm font-medium">
-            Contraseña
-          </label>
+          <div className="flex items-center justify-between">
+            <label htmlFor="password" className="text-sm font-medium">
+              Contraseña
+            </label>
+            <Link
+              href="/recuperar-password"
+              className="text-xs text-muted underline decoration-muted/40 underline-offset-2 hover:text-accent"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
           <input
             id="password"
             name="password"
