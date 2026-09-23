@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/actions/auth";
+import { getBusinessMetrics } from "@/lib/dashboard/metrics";
 import { BusinessPanel } from "./business-panel";
 import { CreateBusinessForm } from "./create-business-form";
 
@@ -37,6 +38,10 @@ export default async function DashboardPage({
     .eq("owner_id", user.id)
     .maybeSingle();
 
+  const metrics = business
+    ? await getBusinessMetrics(supabase, business.id)
+    : null;
+
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
@@ -61,10 +66,10 @@ export default async function DashboardPage({
         </form>
       </div>
 
-      {!business ? (
+      {!business || !metrics ? (
         <CreateBusinessForm defaultServesAtHome={tipo === "domicilio"} />
       ) : (
-        <BusinessPanel business={business} />
+        <BusinessPanel business={business} metrics={metrics} />
       )}
     </main>
   );
