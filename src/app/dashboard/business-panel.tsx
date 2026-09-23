@@ -3,6 +3,8 @@
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { EditBusinessForm } from "./edit-business-form";
+import { formatPrice } from "@/lib/format";
+import type { BusinessMetrics } from "@/lib/dashboard/metrics";
 import type { Business } from "@/types/database";
 
 // No hay nada a lo que suscribirse: solo usamos useSyncExternalStore para
@@ -21,7 +23,13 @@ function getServerOrigin() {
   return null;
 }
 
-export function BusinessPanel({ business }: { business: Business }) {
+export function BusinessPanel({
+  business,
+  metrics,
+}: {
+  business: Business;
+  metrics: BusinessMetrics;
+}) {
   const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
   const origin = useSyncExternalStore(subscribeNoop, getOrigin, getServerOrigin);
@@ -76,6 +84,25 @@ export function BusinessPanel({ business }: { business: Business }) {
         >
           {copied ? "¡Copiado!" : "Copiar"}
         </button>
+      </div>
+
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="rounded-lg border border-border bg-surface px-2 py-3 text-center">
+          <p className="text-xl font-bold text-accent">{metrics.bookingsThisMonth}</p>
+          <p className="mt-1 text-xs text-muted">Turnos este mes</p>
+        </div>
+        <div className="rounded-lg border border-border bg-surface px-2 py-3 text-center">
+          <p className="truncate text-sm font-bold text-accent" title={metrics.topServiceName ?? undefined}>
+            {metrics.topServiceName ?? "—"}
+          </p>
+          <p className="mt-1 text-xs text-muted">Más pedido</p>
+        </div>
+        <div className="rounded-lg border border-border bg-surface px-2 py-3 text-center">
+          <p className="truncate text-sm font-bold text-accent">
+            {formatPrice(metrics.estimatedRevenue)}
+          </p>
+          <p className="mt-1 text-xs text-muted">Facturación estimada</p>
+        </div>
       </div>
 
       {business.description && (
