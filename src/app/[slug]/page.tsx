@@ -4,9 +4,10 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBusinessBySlug } from "@/lib/booking/get-business";
 import { formatPrice } from "@/lib/format";
+import { ManageLinkBox } from "@/components/manage-link-box";
 
 type Params = Promise<{ slug: string }>;
-type SearchParams = Promise<{ reservado?: string }>;
+type SearchParams = Promise<{ reservado?: string; turno?: string }>;
 
 export async function generateMetadata({
   params,
@@ -30,7 +31,7 @@ export default async function BusinessPage({
   searchParams: SearchParams;
 }) {
   const { slug } = await params;
-  const { reservado } = await searchParams;
+  const { reservado, turno } = await searchParams;
   const business = await getBusinessBySlug(slug);
 
   if (!business) {
@@ -93,6 +94,8 @@ export default async function BusinessPage({
           teléfono que dejaste para confirmarlo.
         </p>
       )}
+
+      {reservado === "1" && turno && <ManageLinkBox token={turno} />}
 
       {business.description && (
         <p className="mt-4 text-sm">{business.description}</p>

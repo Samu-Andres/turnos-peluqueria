@@ -1,27 +1,12 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { EditBusinessForm } from "./edit-business-form";
 import { formatPrice } from "@/lib/format";
+import { useOrigin } from "@/lib/use-origin";
 import type { BusinessMetrics } from "@/lib/dashboard/metrics";
 import type { Business } from "@/types/database";
-
-// No hay nada a lo que suscribirse: solo usamos useSyncExternalStore para
-// leer window.location.origin de forma segura con SSR (en el server no
-// existe window, así que ahí devolvemos null y mostramos la ruta relativa
-// hasta que el cliente hidrata con el origin real).
-function subscribeNoop() {
-  return () => {};
-}
-
-function getOrigin() {
-  return window.location.origin;
-}
-
-function getServerOrigin() {
-  return null;
-}
 
 export function BusinessPanel({
   business,
@@ -32,7 +17,7 @@ export function BusinessPanel({
 }) {
   const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
-  const origin = useSyncExternalStore(subscribeNoop, getOrigin, getServerOrigin);
+  const origin = useOrigin();
   const publicUrl = origin ? `${origin}/${business.slug}` : `/${business.slug}`;
 
   async function handleCopyUrl() {

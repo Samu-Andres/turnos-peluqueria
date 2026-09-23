@@ -208,6 +208,7 @@ create table public.bookings (
   client_address text,
   client_name text,
   client_phone text,
+  manage_token uuid not null default gen_random_uuid(),
   created_at timestamptz not null default now()
 );
 
@@ -257,6 +258,7 @@ create policy "bookings: cliente o dueño actualizan (ej. cancelar/confirmar)"
 create index bookings_staff_start_idx on public.bookings (staff_id, start_at);
 create index bookings_client_idx on public.bookings (client_id);
 create index bookings_business_idx on public.bookings (business_id);
+create unique index bookings_manage_token_key on public.bookings (manage_token);
 
 -- ---------------------------------------------------------------
 -- get_busy_intervals: usada por el flujo público de reserva (y por
@@ -448,4 +450,79 @@ create policy "business-photos: el dueño borra sus fotos"
     bucket_id = 'business-photos'
     and (storage.foldername(name))[1] = auth.uid()::text
   );
+
+-- ---------------------------------------------------------------
+-- Gestionar turno sin cuenta: cada reserva (de invitado o con cuenta)
+-- tiene un manage_token al azar. Con ese token se puede ver, cancelar
+-- o reprogramar el turno sin sesión, desde un link que se muestra una
+-- sola vez al confirmar la reserva (no hay mail ni WhatsApp todavía
+-- para reenviarlo, así que el cliente lo tiene que guardar). Las
+-- policies de bookings no dejan leer/editar por token (solo por
+-- client_id o por ser el dueño del negocio), así que estas funciones
+-- corren con privilegios elevados (security definer) pero validan el
+-- token puertas adentro, igual que get_busy_intervals más arriba.
+-- ---------------------------------------------------------------
+create function public.get_booking_by_token(p_token uuid)
+returns setof public.bookings
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select * from public.bookings where manage_token = p_token;
+$$;
+
+grant execute on function public.get_booking_by_token(uuid) to anon, authenticated;
+
+create function public.cancel_booking_by_token(p_token uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  updated_count integer;
+begin
+  update public.bookings
+    set status = 'cancelled'
+    where manage_token = p_token
+      and status in ('pending', 'confirmed');
+  get diagnostics updated_count = row_count;
+  return updated_count > 0;
+end;
+$$;
+
+grant execute on function public.cancel_booking_by_token(uuid) to anon, authenticated;
+
+create function public.reschedule_booking_by_token(
+  p_token uuid,
+  p_start timestamptz,
+  p_end timestamptz
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  updated_count integer;
+begin
+  update public.bookings
+    set start_at = p_start, end_at = p_end
+    where manage_token = p_token
+      and status in ('pending', 'confirmed');
+  get diagnostics updated_count = row_count;
+  return updated_count > 0;
+end;
+$$;
+
+grant execute on function public.reschedule_booking_by_token(uuid, timestamptz, timestamptz)
+  to anon, authenticated;
+
+-- Para una base ya existente: sumar la columna y el índice sin romper
+-- las filas que ya tenía (cada una recibe un token al azar propio).
+alter table public.bookings
+  add column if not exists manage_token uuid not null default gen_random_uuid();
+
+create unique index if not exists bookings_manage_token_key on public.bookings (manage_token);
 

@@ -193,19 +193,23 @@ export async function createBooking(
     new Date(startAt).getTime() + service.duration_minutes * 60000
   ).toISOString();
 
-  const { error } = await supabase.from("bookings").insert({
-    business_id: businessId,
-    staff_id: staffId,
-    service_id: serviceId,
-    client_id: user?.id ?? null,
-    start_at: startAt,
-    end_at: endAt,
-    status: "pending",
-    notes: notes || null,
-    client_address: business?.serves_at_home ? clientAddress : null,
-    client_name: clientName,
-    client_phone: clientPhone,
-  });
+  const { data: inserted, error } = await supabase
+    .from("bookings")
+    .insert({
+      business_id: businessId,
+      staff_id: staffId,
+      service_id: serviceId,
+      client_id: user?.id ?? null,
+      start_at: startAt,
+      end_at: endAt,
+      status: "pending",
+      notes: notes || null,
+      client_address: business?.serves_at_home ? clientAddress : null,
+      client_name: clientName,
+      client_phone: clientPhone,
+    })
+    .select("manage_token")
+    .single();
 
   if (error) {
     // 23P01 = exclusion_violation: otra reserva se metió justo en el medio.
@@ -215,7 +219,13 @@ export async function createBooking(
     return { error: error.message };
   }
 
-  // Con cuenta: al listado de turnos. Como invitado no hay dónde
-  // listarlo, así que volvemos a la página del negocio con un aviso.
-  redirect(user ? "/mis-turnos?reservado=1" : `/${slug}?reservado=1`);
+  // Con cuenta: al listado de turnos, ahí ya puede cancelar o reprogramar.
+  // Como invitado no hay dónde listarlo, así que volvemos a la página del
+  // negocio con un aviso y le mostramos el link para gestionar el turno
+  // (es la única forma que va a tener de volver a encontrarlo).
+  redirect(
+    user
+      ? "/mis-turnos?reservado=1"
+      : `/${slug}?reservado=1&turno=${inserted.manage_token}`
+  );
 }
