@@ -11,7 +11,7 @@
  */
 
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
-export type ProfileRole = "owner" | "client";
+export type ProfileRole = "owner" | "client" | "staff";
 
 export interface Database {
   public: {
@@ -86,6 +86,8 @@ export interface Database {
           full_name: string;
           photo_url: string | null;
           active: boolean;
+          email: string | null;
+          user_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -94,6 +96,8 @@ export interface Database {
           full_name: string;
           photo_url?: string | null;
           active?: boolean;
+          email?: string | null;
+          user_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -102,6 +106,8 @@ export interface Database {
           full_name?: string;
           photo_url?: string | null;
           active?: boolean;
+          email?: string | null;
+          user_id?: string | null;
           created_at?: string;
         };
         Relationships: [];

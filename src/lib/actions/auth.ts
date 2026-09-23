@@ -9,6 +9,12 @@ export type AuthFormState = {
   error: string | null;
 };
 
+function homeForRole(role: ProfileRole | null | undefined): string {
+  if (role === "owner") return "/dashboard";
+  if (role === "staff") return "/staff";
+  return "/";
+}
+
 function readRole(value: FormDataEntryValue | null): ProfileRole {
   return value === "owner" ? "owner" : "client";
 }
@@ -120,7 +126,7 @@ export async function signIn(
     .eq("id", data.user.id)
     .single();
 
-  redirect(profile?.role === "owner" ? "/dashboard" : "/");
+  redirect(homeForRole(profile?.role));
 }
 
 export async function signOut() {
@@ -196,5 +202,5 @@ export async function updatePassword(
     .eq("id", user.id)
     .single();
 
-  redirect(profile?.role === "owner" ? "/dashboard" : "/");
+  redirect(homeForRole(profile?.role));
 }

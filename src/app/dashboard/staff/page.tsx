@@ -40,7 +40,13 @@ export default async function StaffPage() {
 
       <div className="mt-10 border-t border-border pt-8">
         <h2 className="text-lg font-semibold">Agregar persona</h2>
-        <StaffForm />
+        {!business.serves_at_home && (
+          <p className="mt-1 text-sm text-muted">
+            Como tenés local, cada persona va a tener su propia cuenta para
+            entrar a ver y manejar sus turnos.
+          </p>
+        )}
+        <StaffForm requiresAccount={!business.serves_at_home} />
       </div>
     </main>
   );

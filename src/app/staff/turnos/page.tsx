@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
+import { requireStaffSelf } from "@/lib/dashboard/require-staff-access";
 import { formatDateTimeLongAR, formatTimeAR } from "@/lib/booking/time";
 import { CancelOwnerBookingButton } from "@/components/cancel-owner-booking-button";
 import { CompleteBookingButton } from "@/components/complete-booking-button";
@@ -21,37 +20,31 @@ type BookingRow = {
 };
 
 export default async function StaffTurnosPage({
-  params,
+  searchParams,
 }: {
-  params: Promise<{ id: string }>;
+  searchParams: Promise<{ reprogramado?: string }>;
 }) {
-  const { id: staffId } = await params;
-  const { supabase, business } = await requireOwnerBusiness();
-
-  const { data: staff } = await supabase
-    .from("staff")
-    .select("id, full_name")
-    .eq("id", staffId)
-    .eq("business_id", business.id)
-    .maybeSingle();
-
-  if (!staff) {
-    redirect("/dashboard/staff");
-  }
+  const { reprogramado } = await searchParams;
+  const { supabase, staff } = await requireStaffSelf();
+  const staffId = staff.id;
 
   const nowISO = new Date().toISOString();
 
   const [{ data: upcomingRaw }, { data: pastRaw }] = await Promise.all([
     supabase
       .from("bookings")
-      .select("id, start_at, end_at, status, service_id, client_name, client_phone, client_address")
+      .select(
+        "id, start_at, end_at, status, service_id, client_name, client_phone, client_address"
+      )
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
       .gte("start_at", nowISO)
       .order("start_at", { ascending: true }),
     supabase
       .from("bookings")
-      .select("id, start_at, end_at, status, service_id, client_name, client_phone, client_address")
+      .select(
+        "id, start_at, end_at, status, service_id, client_name, client_phone, client_address"
+      )
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
       .lt("start_at", nowISO)
@@ -107,7 +100,7 @@ export default async function StaffTurnosPage({
           )}
           {pastBooking && <CompleteBookingButton bookingId={booking.id} />}
           <Link
-            href={`/dashboard/staff/${staffId}/turnos/${booking.id}/reprogramar`}
+            href={`/staff/turnos/${booking.id}/reprogramar`}
             className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
           >
             Reprogramar
@@ -121,13 +114,19 @@ export default async function StaffTurnosPage({
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
       <Link
-        href="/dashboard/staff"
+        href="/staff"
         className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
       >
-        ← Volver a staff
+        ← Volver a tu panel
       </Link>
 
-      <h1 className="mt-4 text-2xl font-bold">Turnos de {staff.full_name}</h1>
+      <h1 className="mt-4 text-2xl font-bold">Tus turnos</h1>
+
+      {reprogramado === "1" && (
+        <p className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+          ¡Listo! Reprogramamos el turno.
+        </p>
+      )}
 
       <section className="mt-8">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
@@ -136,7 +135,7 @@ export default async function StaffTurnosPage({
 
         {upcoming.length === 0 ? (
           <p className="mt-3 text-sm text-muted">
-            No tiene turnos reservados todavía.
+            No tenés turnos reservados todavía.
           </p>
         ) : (
           <ul className="mt-3 flex flex-col gap-3">

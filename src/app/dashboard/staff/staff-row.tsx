@@ -70,6 +70,9 @@ export function StaffRow({ staff }: { staff: Staff }) {
     <li className="flex flex-col gap-3 rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-border-strong sm:flex-row sm:items-center sm:justify-between">
       <div className={staff.active ? "" : "opacity-50"}>
         <p className="font-medium">{staff.full_name}</p>
+        {staff.email && (
+          <p className="text-sm text-muted">{staff.email}</p>
+        )}
         {!staff.active && (
           <p className="text-sm text-muted">inactivo</p>
         )}

@@ -5,7 +5,11 @@ import { createStaff, type StaffFormState } from "@/lib/actions/staff";
 
 const initialState: StaffFormState = { error: null };
 
-export function StaffForm() {
+export function StaffForm({
+  requiresAccount = false,
+}: {
+  requiresAccount?: boolean;
+}) {
   const [state, formAction, pending] = useActionState(
     createStaff,
     initialState
@@ -37,6 +41,26 @@ export function StaffForm() {
           className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
         />
       </div>
+
+      {requiresAccount && (
+        <div className="flex flex-col gap-1">
+          <label htmlFor="email" className="text-sm font-medium">
+            Mail
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            placeholder="andrea@mail.com"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+          />
+          <span className="text-xs text-muted">
+            Le mandamos una invitación para que se cree su propia cuenta y
+            pueda ver y manejar sus turnos.
+          </span>
+        </div>
+      )}
 
       {state.error && (
         <p className="text-sm text-red-400" role="alert">
