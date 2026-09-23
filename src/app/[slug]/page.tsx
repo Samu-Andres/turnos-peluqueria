@@ -89,8 +89,8 @@ export default async function BusinessPage({
 
       {reservado === "1" && (
         <p className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
-          ¡Listo! Tu turno quedó reservado. Cualquier cosa te contactan al
-          teléfono que dejaste.
+          ¡Listo! Tu turno quedó pendiente de confirmación. Te contactan al
+          teléfono que dejaste para confirmarlo.
         </p>
       )}
 

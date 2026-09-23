@@ -4,6 +4,7 @@ import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
 import { formatDateTimeLongAR, formatTimeAR } from "@/lib/booking/time";
 import { CancelOwnerBookingButton } from "./cancel-owner-booking-button";
 import { CompleteBookingButton } from "./complete-booking-button";
+import { ConfirmBookingButton } from "./confirm-booking-button";
 import { DaySchedule } from "./day-schedule";
 import { STATUS_LABELS, statusBadgeClass } from "@/lib/booking/status-styles";
 import type { BookingStatus } from "@/types/database";
@@ -101,6 +102,9 @@ export default async function StaffTurnosPage({
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-4">
+          {booking.status === "pending" && (
+            <ConfirmBookingButton bookingId={booking.id} />
+          )}
           {pastBooking && <CompleteBookingButton bookingId={booking.id} />}
           <Link
             href={`/dashboard/staff/${staffId}/turnos/${booking.id}/reprogramar`}
