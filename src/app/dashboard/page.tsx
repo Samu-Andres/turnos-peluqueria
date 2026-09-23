@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/actions/auth";
@@ -39,9 +40,17 @@ export default async function DashboardPage({
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          Hola, {profile.full_name}
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-muted">
+            Hola, {profile.full_name}
+          </p>
+          <Link
+            href="/mi-perfil"
+            className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+          >
+            Mi perfil
+          </Link>
+        </div>
         <form action={signOut}>
           <button
             type="submit"

@@ -46,17 +46,19 @@ export default async function ReservarPage({
       supabase.auth.getUser(),
     ]);
 
-  // Si ya está logueado, le precargamos el nombre para no pedírselo de
-  // nuevo (no hace falta cuenta para reservar, pero si la tiene, mejor
-  // no repetir datos que ya dio).
+  // Si ya está logueado, le precargamos nombre y teléfono para no
+  // pedírselos de nuevo (no hace falta cuenta para reservar, pero si la
+  // tiene, mejor no repetir datos que ya dio o que cargó en "Mi perfil").
   let prefillName: string | null = null;
+  let prefillPhone: string | null = null;
   if (userData.user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("full_name")
+      .select("full_name, phone")
       .eq("id", userData.user.id)
       .maybeSingle();
     prefillName = profile?.full_name ?? null;
+    prefillPhone = profile?.phone ?? null;
   }
 
   return (
@@ -79,6 +81,7 @@ export default async function ReservarPage({
           initialDateStr={query.date}
           initialTime={query.time}
           prefillName={prefillName}
+          prefillPhone={prefillPhone}
           servesAtHome={business.serves_at_home}
         />
       ) : (
