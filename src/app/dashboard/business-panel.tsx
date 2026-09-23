@@ -86,6 +86,12 @@ export function BusinessPanel({ business }: { business: Business }) {
 
       <div className="mt-8 flex flex-col gap-3">
         <Link
+          href="/dashboard/fotos"
+          className="rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:bg-surface-hover"
+        >
+          Fotos →
+        </Link>
+        <Link
           href="/dashboard/servicios"
           className="rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:bg-surface-hover"
         >
