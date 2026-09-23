@@ -51,9 +51,14 @@ export default async function MisTurnosPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
-      <Link href="/" className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
-        ← Volver al inicio
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link href="/" className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
+          ← Volver al inicio
+        </Link>
+        <Link href="/mi-perfil" className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
+          Mi perfil
+        </Link>
+      </div>
 
       <h1 className="mt-4 text-2xl font-bold">Mis turnos</h1>
 

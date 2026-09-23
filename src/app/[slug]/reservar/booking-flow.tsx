@@ -29,6 +29,7 @@ export function BookingFlow({
   initialDateStr,
   initialTime,
   prefillName,
+  prefillPhone,
   servesAtHome,
 }: {
   slug: string;
@@ -40,6 +41,7 @@ export function BookingFlow({
   initialDateStr?: string;
   initialTime?: string;
   prefillName?: string | null;
+  prefillPhone?: string | null;
   servesAtHome: boolean;
 }) {
   const [serviceId, setServiceId] = useState<string | null>(() =>
@@ -226,6 +228,7 @@ export function BookingFlow({
           dateStr={dateStr}
           time={time}
           prefillName={prefillName}
+          prefillPhone={prefillPhone}
           servesAtHome={servesAtHome}
           action={boundCreateBooking}
         />
@@ -241,6 +244,7 @@ function ConfirmStep({
   dateStr,
   time,
   prefillName,
+  prefillPhone,
   servesAtHome,
   action,
 }: {
@@ -250,6 +254,7 @@ function ConfirmStep({
   dateStr: string;
   time: string;
   prefillName?: string | null;
+  prefillPhone?: string | null;
   servesAtHome: boolean;
   action: BoundBookingAction;
 }) {
@@ -310,6 +315,7 @@ function ConfirmStep({
             name="client_phone"
             type="tel"
             required
+            defaultValue={prefillPhone ?? undefined}
             placeholder="Para que te puedan contactar"
             className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
