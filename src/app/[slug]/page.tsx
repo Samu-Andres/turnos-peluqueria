@@ -39,7 +39,7 @@ export default async function BusinessPage({
 
   const supabase = await createClient();
 
-  const [{ data: services }, { data: staff }] = await Promise.all([
+  const [{ data: services }, { data: staff }, { data: photos }] = await Promise.all([
     supabase
       .from("services")
       .select("*")
@@ -52,6 +52,11 @@ export default async function BusinessPage({
       .eq("business_id", business.id)
       .eq("active", true)
       .order("full_name", { ascending: true }),
+    supabase
+      .from("business_photos")
+      .select("id, url")
+      .eq("business_id", business.id)
+      .order("created_at", { ascending: true }),
   ]);
 
   const hasStaff = Boolean(staff && staff.length > 0);
@@ -91,6 +96,20 @@ export default async function BusinessPage({
 
       {business.description && (
         <p className="mt-4 text-sm">{business.description}</p>
+      )}
+
+      {photos && photos.length > 0 && (
+        <div className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-4">
+          {photos.map((photo) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={photo.id}
+              src={photo.url}
+              alt=""
+              className="aspect-square w-full rounded-lg border border-border object-cover"
+            />
+          ))}
+        </div>
       )}
 
       <div className="mt-10">

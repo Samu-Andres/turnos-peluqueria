@@ -166,6 +166,27 @@ export interface Database {
         };
         Relationships: [];
       };
+      business_photos: {
+        Row: {
+          id: string;
+          business_id: string;
+          url: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          business_id: string;
+          url: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          business_id?: string;
+          url?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       bookings: {
         Row: {
           id: string;
@@ -241,3 +262,4 @@ export type Staff = Database["public"]["Tables"]["staff"]["Row"];
 export type Service = Database["public"]["Tables"]["services"]["Row"];
 export type WorkingHours = Database["public"]["Tables"]["working_hours"]["Row"];
 export type Booking = Database["public"]["Tables"]["bookings"]["Row"];
+export type BusinessPhoto = Database["public"]["Tables"]["business_photos"]["Row"];

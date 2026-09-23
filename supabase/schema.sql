@@ -387,3 +387,65 @@ drop policy if exists "bookings: con cuenta o como invitado" on public.bookings;
 create policy "bookings: con cuenta o como invitado"
   on public.bookings for insert
   with check (client_id is null or client_id = auth.uid());
+
+-- ---------------------------------------------------------------
+-- business_photos: fotos del local / trabajos, para mostrar en la
+-- página pública del negocio (no confundir con el logo, que es uno
+-- solo y vive en businesses.logo_url).
+-- ---------------------------------------------------------------
+create table public.business_photos (
+  id uuid primary key default gen_random_uuid(),
+  business_id uuid not null references public.businesses (id) on delete cascade,
+  url text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.business_photos enable row level security;
+
+create policy "business_photos: lectura pública"
+  on public.business_photos for select
+  using (true);
+
+create policy "business_photos: el dueño administra sus fotos"
+  on public.business_photos for all
+  using (
+    exists (
+      select 1 from public.businesses
+      where businesses.id = business_photos.business_id
+        and businesses.owner_id = auth.uid()
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.businesses
+      where businesses.id = business_photos.business_id
+        and businesses.owner_id = auth.uid()
+    )
+  );
+
+create index business_photos_business_idx on public.business_photos (business_id);
+
+-- Storage: mismo esquema que el bucket de logos, pero para varias fotos
+-- por negocio. Carpeta por owner_id, lectura pública.
+insert into storage.buckets (id, name, public)
+values ('business-photos', 'business-photos', true)
+on conflict (id) do nothing;
+
+create policy "business-photos: lectura pública"
+  on storage.objects for select
+  using (bucket_id = 'business-photos');
+
+create policy "business-photos: el dueño sube sus fotos"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'business-photos'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "business-photos: el dueño borra sus fotos"
+  on storage.objects for delete
+  using (
+    bucket_id = 'business-photos'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
