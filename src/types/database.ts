@@ -201,6 +201,7 @@ export interface Database {
           client_address: string | null;
           client_name: string | null;
           client_phone: string | null;
+          manage_token: string;
           created_at: string;
         };
         Insert: {
@@ -216,6 +217,7 @@ export interface Database {
           client_address?: string | null;
           client_name?: string | null;
           client_phone?: string | null;
+          manage_token?: string;
           created_at?: string;
         };
         Update: {
@@ -231,6 +233,7 @@ export interface Database {
           client_address?: string | null;
           client_name?: string | null;
           client_phone?: string | null;
+          manage_token?: string;
           created_at?: string;
         };
         Relationships: [];
@@ -249,6 +252,41 @@ export interface Database {
           start_at: string;
           end_at: string;
         }[];
+      };
+      get_booking_by_token: {
+        Args: {
+          p_token: string;
+        };
+        Returns: {
+          id: string;
+          business_id: string;
+          staff_id: string;
+          service_id: string;
+          client_id: string | null;
+          start_at: string;
+          end_at: string;
+          status: BookingStatus;
+          notes: string | null;
+          client_address: string | null;
+          client_name: string | null;
+          client_phone: string | null;
+          manage_token: string;
+          created_at: string;
+        }[];
+      };
+      cancel_booking_by_token: {
+        Args: {
+          p_token: string;
+        };
+        Returns: boolean;
+      };
+      reschedule_booking_by_token: {
+        Args: {
+          p_token: string;
+          p_start: string;
+          p_end: string;
+        };
+        Returns: boolean;
       };
     };
     Enums: Record<string, never>;
