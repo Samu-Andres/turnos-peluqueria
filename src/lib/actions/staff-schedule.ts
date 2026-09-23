@@ -131,6 +131,19 @@ export async function getStaffDaySchedule(
   };
 }
 
+export async function confirmBooking(bookingId: string): Promise<void> {
+  const { supabase, business } = await requireOwnerBusiness();
+
+  await supabase
+    .from("bookings")
+    .update({ status: "confirmed" })
+    .eq("id", bookingId)
+    .eq("business_id", business.id)
+    .eq("status", "pending");
+
+  revalidatePath("/dashboard/staff/[id]/turnos", "page");
+}
+
 export async function ownerCancelBooking(bookingId: string): Promise<void> {
   const { supabase, business } = await requireOwnerBusiness();
 

@@ -200,7 +200,7 @@ export async function createBooking(
     client_id: user?.id ?? null,
     start_at: startAt,
     end_at: endAt,
-    status: "confirmed",
+    status: "pending",
     notes: notes || null,
     client_address: business?.serves_at_home ? clientAddress : null,
     client_name: clientName,
