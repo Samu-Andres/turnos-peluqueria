@@ -193,23 +193,26 @@ export async function createBooking(
     new Date(startAt).getTime() + service.duration_minutes * 60000
   ).toISOString();
 
-  const { data: inserted, error } = await supabase
-    .from("bookings")
-    .insert({
-      business_id: businessId,
-      staff_id: staffId,
-      service_id: serviceId,
-      client_id: user?.id ?? null,
-      start_at: startAt,
-      end_at: endAt,
-      status: "pending",
-      notes: notes || null,
-      client_address: business?.serves_at_home ? clientAddress : null,
-      client_name: clientName,
-      client_phone: clientPhone,
-    })
-    .select("manage_token")
-    .single();
+  // El token para gestionar la reserva lo generamos acá en vez de
+  // pedírselo de vuelta a la base: un invitado (sin sesión) no tiene
+  // permiso de lectura sobre bookings, y un insert que además hace
+  // .select() lo rechaza Supabase entero por RLS.
+  const manageToken = crypto.randomUUID();
+
+  const { error } = await supabase.from("bookings").insert({
+    business_id: businessId,
+    staff_id: staffId,
+    service_id: serviceId,
+    client_id: user?.id ?? null,
+    start_at: startAt,
+    end_at: endAt,
+    status: "pending",
+    notes: notes || null,
+    client_address: business?.serves_at_home ? clientAddress : null,
+    client_name: clientName,
+    client_phone: clientPhone,
+    manage_token: manageToken,
+  });
 
   if (error) {
     // 23P01 = exclusion_violation: otra reserva se metió justo en el medio.
@@ -226,6 +229,6 @@ export async function createBooking(
   redirect(
     user
       ? "/mis-turnos?reservado=1"
-      : `/${slug}?reservado=1&turno=${inserted.manage_token}`
+      : `/${slug}?reservado=1&turno=${manageToken}`
   );
 }
