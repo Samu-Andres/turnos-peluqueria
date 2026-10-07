@@ -1,24 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
-import { formatDateTimeLongAR, formatTimeAR } from "@/lib/booking/time";
-import { CancelOwnerBookingButton } from "@/components/cancel-owner-booking-button";
-import { CompleteBookingButton } from "@/components/complete-booking-button";
-import { ConfirmBookingButton } from "@/components/confirm-booking-button";
 import { DaySchedule } from "@/components/day-schedule";
-import { STATUS_LABELS, statusBadgeClass } from "@/lib/booking/status-styles";
-import type { BookingStatus } from "@/types/database";
+import {
+  OwnerBookingCard,
+  type OwnerBookingRow,
+} from "@/components/owner-booking-card";
 
-type BookingRow = {
-  id: string;
-  start_at: string;
-  end_at: string;
-  status: BookingStatus;
-  service_id: string;
-  client_name: string | null;
-  client_phone: string | null;
-  client_address: string | null;
-};
 
 export default async function StaffTurnosPage({
   params,
@@ -44,14 +32,14 @@ export default async function StaffTurnosPage({
   const [{ data: upcomingRaw }, { data: pastRaw }] = await Promise.all([
     supabase
       .from("bookings")
-      .select("id, start_at, end_at, status, service_id, client_name, client_phone, client_address")
+      .select("id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address")
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
       .gte("start_at", nowISO)
       .order("start_at", { ascending: true }),
     supabase
       .from("bookings")
-      .select("id, start_at, end_at, status, service_id, client_name, client_phone, client_address")
+      .select("id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address")
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
       .lt("start_at", nowISO)
@@ -71,50 +59,16 @@ export default async function StaffTurnosPage({
 
   const serviceById = new Map((servicesRes.data ?? []).map((s) => [s.id, s.name]));
 
-  function renderBooking(booking: BookingRow, pastBooking: boolean) {
+  function renderBooking(booking: OwnerBookingRow, pastBooking: boolean) {
     return (
-      <li
+      <OwnerBookingCard
         key={booking.id}
-        className="card px-4 py-4"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="font-medium">
-              {serviceById.get(booking.service_id) ?? "Servicio"} ·{" "}
-              {booking.client_name ?? "Cliente"}
-            </p>
-            <p className="mt-1 text-sm capitalize text-muted">
-              {formatDateTimeLongAR(booking.start_at)} a las{" "}
-              {formatTimeAR(booking.start_at)}
-            </p>
-            {booking.client_phone && (
-              <p className="mt-1 text-sm text-muted">Tel: {booking.client_phone}</p>
-            )}
-            {booking.client_address && (
-              <p className="mt-1 text-sm text-accent">
-                A domicilio: {booking.client_address}
-              </p>
-            )}
-          </div>
-          <span className={statusBadgeClass(booking.status)}>
-            {STATUS_LABELS[booking.status]}
-          </span>
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-4">
-          {booking.status === "pending" && (
-            <ConfirmBookingButton bookingId={booking.id} />
-          )}
-          {pastBooking && <CompleteBookingButton bookingId={booking.id} />}
-          <Link
-            href={`/dashboard/staff/${staffId}/turnos/${booking.id}/reprogramar`}
-            className="action"
-          >
-            Reprogramar
-          </Link>
-          <CancelOwnerBookingButton bookingId={booking.id} />
-        </div>
-      </li>
+        booking={booking}
+        serviceName={serviceById.get(booking.service_id) ?? "Servicio"}
+        rescheduleHref={`/dashboard/staff/${staffId}/turnos/${booking.id}/reprogramar`}
+        showDate
+        past={pastBooking}
+      />
     );
   }
 
@@ -128,6 +82,13 @@ export default async function StaffTurnosPage({
       </Link>
 
       <h1 className="page-title mt-4">Turnos de {staff.full_name}</h1>
+      <p className="page-subtitle">
+        ¿Querés ver los de todo el local juntos?{" "}
+        <Link href="/dashboard/agenda" className="link">
+          Abrí la agenda
+        </Link>
+        .
+      </p>
 
       <section className="mt-8">
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">

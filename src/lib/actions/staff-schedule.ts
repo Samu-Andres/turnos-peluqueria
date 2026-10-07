@@ -172,6 +172,8 @@ async function requireOwnerOrAssignedStaff(bookingId: string) {
 
 function revalidateStaffTurnos() {
   revalidatePath("/dashboard/staff/[id]/turnos", "page");
+  revalidatePath("/dashboard/agenda");
+  revalidatePath("/dashboard");
   revalidatePath("/staff/turnos");
 }
 

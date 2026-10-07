@@ -7,10 +7,13 @@ import { rescheduleBookingAsOwner } from "@/lib/actions/reschedule";
 
 export default async function ReprogramarTurnoOwnerPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string; bookingId: string }>;
+  searchParams: Promise<{ desde?: string }>;
 }) {
   const { id: staffId, bookingId } = await params;
+  const fromAgenda = (await searchParams).desde === "agenda";
   const { supabase, business } = await requireOwnerBusiness();
 
   const { data: staff } = await supabase
@@ -36,7 +39,7 @@ export default async function ReprogramarTurnoOwnerPage({
     !booking ||
     (booking.status !== "pending" && booking.status !== "confirmed")
   ) {
-    redirect(`/dashboard/staff/${staffId}/turnos`);
+    redirect(fromAgenda ? "/dashboard/agenda" : `/dashboard/staff/${staffId}/turnos`);
   }
 
   const { data: service } = await supabase
@@ -51,13 +54,15 @@ export default async function ReprogramarTurnoOwnerPage({
     booking.start_at
   )}`;
 
+  const backHref = fromAgenda ? "/dashboard/agenda" : `/dashboard/staff/${staffId}/turnos`;
+
   return (
     <main className="page">
       <Link
-        href={`/dashboard/staff/${staffId}/turnos`}
+        href={backHref}
         className="back-link"
       >
-        ← Volver a turnos de {staff.full_name}
+        {fromAgenda ? "← Volver a la agenda" : `← Volver a turnos de ${staff.full_name}`}
       </Link>
 
       <h1 className="page-title mt-4">Reprogramar turno</h1>
@@ -67,8 +72,12 @@ export default async function ReprogramarTurnoOwnerPage({
         staffId={booking.staff_id}
         serviceId={booking.service_id}
         summary={summary}
-        backHref={`/dashboard/staff/${staffId}/turnos`}
-        action={rescheduleBookingAsOwner.bind(null, booking.id)}
+        backHref={backHref}
+        action={rescheduleBookingAsOwner.bind(
+          null,
+          booking.id,
+          fromAgenda ? "agenda" : null
+        )}
       />
     </main>
   );

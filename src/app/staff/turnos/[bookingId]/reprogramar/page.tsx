@@ -56,7 +56,7 @@ export default async function ReprogramarTurnoStaffPage({
         serviceId={booking.service_id}
         summary={summary}
         backHref="/staff/turnos"
-        action={rescheduleBookingAsOwner.bind(null, booking.id)}
+        action={rescheduleBookingAsOwner.bind(null, booking.id, null)}
       />
     </main>
   );

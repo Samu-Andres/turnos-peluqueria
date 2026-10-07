@@ -104,6 +104,8 @@ export async function rescheduleBookingAsClient(
  */
 export async function rescheduleBookingAsOwner(
   bookingId: string,
+  // "agenda": el dueño llegó desde la agenda general y vuelve ahí.
+  returnTo: "agenda" | null,
   _prevState: RescheduleFormState,
   formData: FormData
 ): Promise<RescheduleFormState> {
@@ -195,9 +197,12 @@ export async function rescheduleBookingAsOwner(
 
   // El dueño vuelve al listado de turnos de ese staff; la propia
   // persona (si fue quien reprogramó) vuelve a su propio listado.
+  if (!isOwner) {
+    redirect("/staff/turnos?reprogramado=1");
+  }
   redirect(
-    isOwner
-      ? `/dashboard/staff/${booking.staff_id}/turnos?reprogramado=1`
-      : "/staff/turnos?reprogramado=1"
+    returnTo === "agenda"
+      ? "/dashboard/agenda?reprogramado=1"
+      : `/dashboard/staff/${booking.staff_id}/turnos?reprogramado=1`
   );
 }

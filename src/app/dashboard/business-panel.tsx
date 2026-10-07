@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
+  BellRing,
   CalendarCheck,
+  CalendarDays,
   Check,
   ChevronRight,
   Copy,
@@ -27,10 +29,12 @@ export function BusinessPanel({
   business,
   metrics,
   setupSteps,
+  agenda,
 }: {
   business: Business;
   metrics: BusinessMetrics;
   setupSteps: string[];
+  agenda: { pendingCount: number; todayCount: number };
 }) {
   const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -55,10 +59,20 @@ export function BusinessPanel({
 
   const tiles = [
     {
+      href: "/dashboard/agenda",
+      icon: CalendarDays,
+      title: "Agenda",
+      text:
+        agenda.todayCount > 0
+          ? `${agenda.todayCount} ${agenda.todayCount === 1 ? "turno queda" : "turnos quedan"} hoy.`
+          : "Los turnos de todo el staff.",
+      badge: agenda.pendingCount,
+    },
+    {
       href: "/dashboard/staff",
       icon: Users,
-      title: "Staff, horarios y turnos",
-      text: "Quién atiende, cuándo trabaja y su agenda.",
+      title: "Staff y horarios",
+      text: "Quién atiende y cuándo trabaja.",
     },
     {
       href: "/dashboard/servicios",
@@ -144,6 +158,23 @@ export function BusinessPanel({
         </div>
       </section>
 
+      {agenda.pendingCount > 0 && (
+        <Link
+          href="/dashboard/agenda"
+          className="alert-warning flex items-center gap-3 transition-colors hover:border-warning"
+        >
+          <BellRing aria-hidden className="h-5 w-5 shrink-0" />
+          <span className="flex-1">
+            <span className="font-semibold">
+              Tenés {agenda.pendingCount}{" "}
+              {agenda.pendingCount === 1 ? "turno" : "turnos"} sin confirmar.
+            </span>{" "}
+            Confirmalos para que el cliente sepa que lo esperan.
+          </span>
+          <ChevronRight aria-hidden className="h-4 w-4 shrink-0" />
+        </Link>
+      )}
+
       {setupSteps.length > 0 && (
         <section className="alert-warning flex gap-3">
           <TriangleAlert aria-hidden className="mt-0.5 h-5 w-5 shrink-0" />
@@ -171,11 +202,18 @@ export function BusinessPanel({
         </div>
       </section>
 
-      <nav aria-label="Administrar negocio" className="grid gap-3 sm:grid-cols-3">
-        {tiles.map(({ href, icon: Icon, title, text }) => (
+      <nav aria-label="Administrar negocio" className="grid gap-3 sm:grid-cols-2">
+        {tiles.map(({ href, icon: Icon, title, text, badge }) => (
           <Link key={href} href={href} className="card-interactive group flex flex-col gap-3 p-5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent">
-              <Icon aria-hidden className="h-5 w-5" />
+            <span className="flex items-center justify-between">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent">
+                <Icon aria-hidden className="h-5 w-5" />
+              </span>
+              {badge ? (
+                <span className="rounded-full bg-warning-soft px-2.5 py-1 text-xs font-bold text-warning">
+                  {badge} sin confirmar
+                </span>
+              ) : null}
             </span>
             <div>
               <p className="flex items-center gap-1 font-semibold">
@@ -209,7 +247,7 @@ function Stat({
         <Icon aria-hidden className="h-5 w-5" />
       </span>
       <div className="min-w-0">
-        <p className="truncate text-lg font-bold" title={value}>
+        <p className="line-clamp-2 break-words text-base font-bold leading-snug" title={value}>
           {value}
         </p>
         <p className="text-xs text-muted">{label}</p>

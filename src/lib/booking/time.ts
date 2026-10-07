@@ -123,3 +123,14 @@ export function formatDateTimeLongAR(iso: string): string {
     timeZone: BUSINESS_TIMEZONE,
   }).format(new Date(iso));
 }
+
+/** Un timestamptz ISO -> "YYYY-MM-DD" del día en Argentina, para agrupar turnos por día. */
+export function isoToDateStrAR(iso: string): string {
+  // en-CA formatea las fechas como YYYY-MM-DD.
+  return new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: BUSINESS_TIMEZONE,
+  }).format(new Date(iso));
+}

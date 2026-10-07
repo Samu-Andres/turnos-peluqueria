@@ -1,6 +1,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBusinessMetrics } from "@/lib/dashboard/metrics";
+import {
+  addDaysToDateStr,
+  combineDateAndTimeToISO,
+  todayInBusinessTZ,
+} from "@/lib/booking/time";
 import { BusinessPanel } from "./business-panel";
 import { CreateBusinessForm } from "./create-business-form";
 
@@ -40,7 +45,12 @@ export default async function DashboardPage({
     ? await getBusinessMetrics(supabase, business.id)
     : null;
 
-  const setupSteps = business ? await getMissingSetup(supabase, business.id) : [];
+  const [setupSteps, agenda] = business
+    ? await Promise.all([
+        getMissingSetup(supabase, business.id),
+        getAgendaSummary(supabase, business.id),
+      ])
+    : [[], { pendingCount: 0, todayCount: 0 }];
 
   return (
     <main className="page">
@@ -53,10 +63,42 @@ export default async function DashboardPage({
           business={business}
           metrics={metrics}
           setupSteps={setupSteps}
+          agenda={agenda}
         />
       )}
     </main>
   );
+}
+
+/**
+ * Para el aviso del panel: cuántos turnos esperan confirmación y cuántos
+ * hay hoy (de todo el staff).
+ */
+async function getAgendaSummary(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  businessId: string
+): Promise<{ pendingCount: number; todayCount: number }> {
+  const nowISO = new Date().toISOString();
+  const today = todayInBusinessTZ();
+  const todayEnd = combineDateAndTimeToISO(addDaysToDateStr(today, 1), "00:00");
+
+  const [{ count: pendingCount }, { count: todayCount }] = await Promise.all([
+    supabase
+      .from("bookings")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", businessId)
+      .eq("status", "pending")
+      .gte("start_at", nowISO),
+    supabase
+      .from("bookings")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", businessId)
+      .in("status", ["pending", "confirmed"])
+      .gte("start_at", nowISO)
+      .lt("start_at", todayEnd),
+  ]);
+
+  return { pendingCount: pendingCount ?? 0, todayCount: todayCount ?? 0 };
 }
 
 /**
