@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { createStaff, type StaffFormState } from "@/lib/actions/staff";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialState: StaffFormState = { error: null };
 
@@ -25,7 +26,7 @@ export function StaffForm({
   return (
     <form
       ref={formRef}
-      action={formAction}
+      onSubmit={submitWithoutReset(formAction)}
       className="mt-4 flex flex-col gap-4"
     >
       <div className="field">

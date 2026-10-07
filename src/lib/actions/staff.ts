@@ -171,7 +171,8 @@ export async function updateStaff(
     .eq("business_id", business.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("updateStaff:", error);
+    return { error: "No pudimos guardar los cambios, probá de nuevo." };
   }
 
   revalidatePath("/dashboard/staff");

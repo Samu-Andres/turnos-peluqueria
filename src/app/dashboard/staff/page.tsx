@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
 import { StaffForm } from "./staff-form";
 import { StaffRow } from "./staff-row";
+
+export const metadata: Metadata = { title: "Staff" };
 
 export default async function StaffPage() {
   const { supabase, business } = await requireOwnerBusiness();

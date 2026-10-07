@@ -74,7 +74,8 @@ export async function addBusinessPhotos(
   );
 
   if (error) {
-    return { error: error.message };
+    console.error("businessPhotos:", error);
+    return { error: "No pudimos guardar la foto, probá de nuevo." };
   }
 
   revalidatePath("/dashboard/fotos");

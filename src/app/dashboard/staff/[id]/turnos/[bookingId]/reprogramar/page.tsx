@@ -50,9 +50,9 @@ export default async function ReprogramarTurnoOwnerPage({
 
   const summary = `${service?.name ?? "Servicio"}${
     booking.client_name ? ` · ${booking.client_name}` : ""
-  } — actualmente el ${formatDateTimeLongAR(booking.start_at)} a las ${formatTimeAR(
+  } — ${formatDateTimeLongAR(booking.start_at)}, ${formatTimeAR(
     booking.start_at
-  )}`;
+  )} hs`;
 
   const backHref = fromAgenda ? "/dashboard/agenda" : `/dashboard/staff/${staffId}/turnos`;
 

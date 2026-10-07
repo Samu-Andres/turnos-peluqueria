@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
 import { PhotoGrid } from "./photo-grid";
 import { PhotosForm } from "./photos-form";
+
+export const metadata: Metadata = { title: "Fotos" };
 
 export default async function FotosPage() {
   const { supabase, business } = await requireOwnerBusiness();

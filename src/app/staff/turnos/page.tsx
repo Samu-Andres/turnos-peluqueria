@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requireStaffSelf } from "@/lib/dashboard/require-staff-access";
 import { formatDateTimeLongAR, formatTimeAR } from "@/lib/booking/time";
@@ -7,6 +8,8 @@ import { ConfirmBookingButton } from "@/components/confirm-booking-button";
 import { DaySchedule } from "@/components/day-schedule";
 import { STATUS_LABELS, statusBadgeClass } from "@/lib/booking/status-styles";
 import type { BookingStatus } from "@/types/database";
+
+export const metadata: Metadata = { title: "Mis turnos" };
 
 type BookingRow = {
   id: string;

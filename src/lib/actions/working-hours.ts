@@ -52,7 +52,8 @@ export async function saveWorkingHours(
     .eq("staff_id", staffId);
 
   if (deleteError) {
-    return { error: deleteError.message };
+    console.error("saveWorkingHours:", deleteError);
+    return { error: "No pudimos guardar los horarios, probá de nuevo." };
   }
 
   if (rows.length > 0) {
@@ -61,7 +62,8 @@ export async function saveWorkingHours(
       .insert(rows);
 
     if (insertError) {
-      return { error: insertError.message };
+      console.error("saveWorkingHours:", insertError);
+      return { error: "No pudimos guardar los horarios, probá de nuevo." };
     }
   }
 

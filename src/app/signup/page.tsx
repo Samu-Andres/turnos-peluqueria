@@ -4,6 +4,7 @@ import { Suspense, useActionState, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { signUp, type AuthFormState } from "@/lib/actions/auth";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialState: AuthFormState = { error: null };
 
@@ -23,7 +24,7 @@ function SignupForm() {
         </p>
       </div>
 
-      <form action={formAction} className="card flex flex-col gap-4 p-5 sm:p-6">
+      <form onSubmit={submitWithoutReset(formAction)} className="card flex flex-col gap-4 p-5 sm:p-6">
         {next && <input type="hidden" name="next" value={next} />}
 
         <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de cuenta">

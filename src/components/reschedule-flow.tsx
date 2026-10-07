@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { CalendarClock } from "lucide-react";
+import { DateStrip, SlotGrid } from "@/components/booking-pickers";
 import {
   addDaysToDateStr,
   formatDateLongAR,
@@ -9,6 +11,7 @@ import {
 } from "@/lib/booking/time";
 import { getAvailableSlots } from "@/lib/actions/booking-flow";
 import type { RescheduleFormState } from "@/lib/actions/reschedule";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const DAYS_AHEAD = 14;
 
@@ -70,103 +73,72 @@ export function RescheduleFlow({
   }
 
   return (
-    <div className="mt-8 flex flex-col gap-6">
-      <p className="text-sm text-muted">{summary}</p>
-
-      <div>
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-          Nuevo día
-        </h2>
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
-          {dateOptions.map((d) => (
-            <button
-              key={d}
-              type="button"
-              onClick={() => {
-                setDateStr(d);
-                setTime(null);
-              }}
-              className={`shrink-0 whitespace-nowrap rounded-lg border px-3 py-2 text-xs font-medium capitalize ${
-                dateStr === d
-                  ? "border-accent bg-accent-soft text-foreground ring-1 ring-accent"
-                  : "border-border bg-surface hover:border-border-strong"
-              }`}
-            >
-              {formatDateLongAR(d)}
-            </button>
-          ))}
+    <div className="mt-6 flex flex-col gap-8">
+      <div className="card flex items-start gap-3 p-4">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-sunken text-muted">
+          <CalendarClock aria-hidden className="h-5 w-5" />
+        </span>
+        <div>
+          <p className="text-xs font-medium text-muted">Turno actual</p>
+          <p className="text-sm font-semibold first-letter:uppercase">{summary}</p>
         </div>
       </div>
 
+      <section>
+        <h2 className="mb-3 font-semibold">Elegí el nuevo día</h2>
+        <DateStrip
+          dates={dateOptions}
+          value={dateStr}
+          onChange={(d) => {
+            setDateStr(d);
+            setTime(null);
+          }}
+        />
+      </section>
+
       {dateStr && (
-        <div>
-          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-            Nuevo horario
-          </h2>
+        <section>
+          <h2 className="font-semibold">Elegí el nuevo horario</h2>
+          <p className="mb-3 text-sm text-muted first-letter:uppercase">
+            {formatDateLongAR(dateStr)}
+          </p>
+          <SlotGrid
+            slots={slots}
+            value={time}
+            onChange={setTime}
+            loading={isLoadingSlots}
+            error={slotsError}
+          />
+        </section>
+      )}
 
-          {isLoadingSlots && (
-            <p className="mt-3 text-sm text-muted">Buscando horarios...</p>
-          )}
+      <form onSubmit={submitWithoutReset(handleSubmit)} className="flex flex-col gap-3 border-t border-border pt-6">
+        <input type="hidden" name="date" value={dateStr ?? ""} />
+        <input type="hidden" name="time" value={time ?? ""} />
 
-          {!isLoadingSlots && slotsError && (
-            <p className="form-error mt-3">{slotsError}</p>
-          )}
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
 
-          {!isLoadingSlots && !slotsError && slots && slots.length === 0 && (
-            <p className="mt-3 text-sm text-muted">
-              No hay horarios libres ese día, probá con otra fecha.
-            </p>
-          )}
-
-          {!isLoadingSlots && slots && slots.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {slots.map((slot) => (
-                <button
-                  key={slot}
-                  type="button"
-                  onClick={() => setTime(slot)}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium ${
-                    time === slot
-                      ? "border-accent bg-accent-soft text-foreground ring-1 ring-accent"
-                      : "border-border bg-surface hover:border-border-strong"
-                  }`}
-                >
-                  {slot}
-                </button>
-              ))}
-            </div>
-          )}
+        <div className="flex flex-col-reverse gap-3 sm:flex-row">
+          <Link href={backHref} className="btn btn-secondary">
+            Volver sin cambiar
+          </Link>
+          <button
+            type="submit"
+            disabled={isSaving || !dateStr || !time}
+            className="btn btn-primary sm:flex-1"
+          >
+            {isSaving
+              ? "Guardando..."
+              : time
+                ? `Pasar el turno a las ${time}`
+                : "Elegí día y horario"}
+          </button>
         </div>
-      )}
-
-      {dateStr && time && (
-        <form action={handleSubmit} className="flex flex-col gap-3">
-          <input type="hidden" name="date" value={dateStr} />
-          <input type="hidden" name="time" value={time} />
-
-          {error && (
-            <p className="form-error" role="alert">
-              {error}
-            </p>
-          )}
-
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="btn btn-primary"
-            >
-              {isSaving ? "Guardando..." : "Confirmar nuevo horario"}
-            </button>
-            <Link
-              href={backHref}
-              className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-accent hover:text-accent"
-            >
-              Cancelar
-            </Link>
-          </div>
-        </form>
-      )}
+      </form>
     </div>
   );
 }

@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import {
-  addDaysToDateStr,
-  formatDateLongAR,
-  todayInBusinessTZ,
-} from "@/lib/booking/time";
+import { LoaderCircle } from "lucide-react";
+import { addDaysToDateStr, todayInBusinessTZ } from "@/lib/booking/time";
+import { DateStrip } from "@/components/booking-pickers";
 import {
   getStaffDaySchedule,
   type StaffDaySchedule,
@@ -33,25 +31,15 @@ export function DaySchedule({ staffId }: { staffId: string }) {
 
   return (
     <div className="mt-3">
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {dateOptions.map((d) => (
-          <button
-            key={d}
-            type="button"
-            onClick={() => setDateStr(d)}
-            className={`shrink-0 whitespace-nowrap rounded-lg border px-3 py-2 text-xs font-medium capitalize ${
-              dateStr === d
-                ? "border-accent bg-accent-soft text-foreground ring-1 ring-accent"
-                : "border-border bg-surface hover:border-border-strong"
-            }`}
-          >
-            {formatDateLongAR(d)}
-          </button>
-        ))}
-      </div>
+      <DateStrip dates={dateOptions} value={dateStr} onChange={setDateStr} />
 
       <div className="mt-4">
-        {isPending && <p className="text-sm text-muted">Cargando...</p>}
+        {isPending && (
+          <p className="flex items-center gap-2 text-sm text-muted" role="status">
+            <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
+            Cargando...
+          </p>
+        )}
 
         {!isPending && schedule && "error" in schedule && (
           <p className="form-error">{schedule.error}</p>
@@ -80,7 +68,7 @@ export function DaySchedule({ staffId }: { staffId: string }) {
                 {schedule.freeRanges.map((r, i) => (
                   <span
                     key={i}
-                    className="rounded-lg border border-success-border bg-success-soft px-3 py-1 text-sm text-success"
+                    className="rounded-lg border border-success-border bg-success-soft px-3 py-1 text-sm font-medium tabular-nums text-success"
                   >
                     {r.start} a {r.end}
                   </span>
@@ -97,7 +85,7 @@ export function DaySchedule({ staffId }: { staffId: string }) {
               {schedule.bookings.map((b) => (
                 <li
                   key={b.id}
-                  className="flex flex-col gap-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+                  className="flex flex-col gap-1 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm"
                 >
                   <span>
                     {b.startTime} a {b.endTime} · {b.serviceName} ·{" "}
@@ -109,7 +97,7 @@ export function DaySchedule({ staffId }: { staffId: string }) {
                     </span>
                   )}
                   {b.clientAddress && (
-                    <span className="text-xs text-accent">
+                    <span className="text-xs text-muted">
                       A domicilio: {b.clientAddress}
                     </span>
                   )}

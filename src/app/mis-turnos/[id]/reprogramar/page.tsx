@@ -52,9 +52,9 @@ export default async function ReprogramarMiTurnoPage({
 
   const summary = `${service?.name ?? "Servicio"}${
     staffMember ? ` · con ${staffMember.full_name}` : ""
-  } — actualmente el ${formatDateTimeLongAR(booking.start_at)} a las ${formatTimeAR(
+  } — ${formatDateTimeLongAR(booking.start_at)}, ${formatTimeAR(
     booking.start_at
-  )}`;
+  )} hs`;
 
   return (
     <main className="page">

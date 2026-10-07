@@ -219,7 +219,8 @@ export async function createBooking(
     if (error.code === "23P01") {
       return { error: "Justo se ocupó ese horario, elegí otro." };
     }
-    return { error: error.message };
+    console.error("createBooking:", error);
+    return { error: "No pudimos reservar el turno, probá de nuevo." };
   }
 
   // Con cuenta: al listado de turnos, ahí ya puede cancelar o reprogramar.

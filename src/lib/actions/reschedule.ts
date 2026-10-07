@@ -88,7 +88,8 @@ export async function rescheduleBookingAsClient(
     if (error.code === "23P01") {
       return { error: "Justo se ocupó ese horario, elegí otro." };
     }
-    return { error: error.message };
+    console.error("reschedule:", error);
+    return { error: "No pudimos reprogramar el turno, probá de nuevo." };
   }
 
   redirect("/mis-turnos?reprogramado=1");
@@ -192,7 +193,8 @@ export async function rescheduleBookingAsOwner(
     if (error.code === "23P01") {
       return { error: "Justo se ocupó ese horario, elegí otro." };
     }
-    return { error: error.message };
+    console.error("reschedule:", error);
+    return { error: "No pudimos reprogramar el turno, probá de nuevo." };
   }
 
   // El dueño vuelve al listado de turnos de ese staff; la propia

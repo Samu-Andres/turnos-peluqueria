@@ -4,6 +4,7 @@ import { Suspense, useActionState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { signIn, type AuthFormState } from "@/lib/actions/auth";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialState: AuthFormState = { error: null };
 
@@ -30,13 +31,13 @@ function LoginForm() {
       )}
 
       {confirmError && (
-        <p className="rounded-lg border border-danger-border bg-danger-soft px-4 py-3 text-sm text-danger">
+        <p className="alert-danger">
           El link ya se usó o venció. Si ya confirmaste tu email, entrá
           normalmente; si no, registrate de nuevo.
         </p>
       )}
 
-      <form action={formAction} className="card flex flex-col gap-4 p-5 sm:p-6">
+      <form onSubmit={submitWithoutReset(formAction)} className="card flex flex-col gap-4 p-5 sm:p-6">
         {next && <input type="hidden" name="next" value={next} />}
 
         <div className="field">

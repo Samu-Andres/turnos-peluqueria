@@ -131,6 +131,12 @@ export async function signIn(
   });
 
   if (error) {
+    if (error.code === "email_not_confirmed") {
+      return {
+        error:
+          "Todavía no confirmaste tu email. Buscá el mail que te mandamos (fijate también en spam).",
+      };
+    }
     return { error: "Email o contraseña incorrectos." };
   }
 
@@ -211,7 +217,13 @@ export async function updatePassword(
   const { error } = await supabase.auth.updateUser({ password });
 
   if (error) {
-    return { error: error.message };
+    if (error.code === "same_password") {
+      return { error: "La nueva contraseña tiene que ser distinta de la anterior." };
+    }
+    if (error.code === "weak_password") {
+      return { error: "Elegí una contraseña más segura." };
+    }
+    return { error: "No pudimos cambiar la contraseña, probá de nuevo." };
   }
 
   const { data: profile } = await supabase

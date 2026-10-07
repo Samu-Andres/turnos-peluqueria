@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { updateBusiness, type BusinessFormState } from "@/lib/actions/business";
 import { LogoField } from "@/components/logo-field";
 import type { Business } from "@/types/database";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialState: BusinessFormState = { error: null };
 
@@ -24,7 +25,7 @@ export function EditBusinessForm({
         cambia aunque edites el nombre.
       </p>
 
-      <form action={formAction} className="mt-6 flex flex-col gap-4">
+      <form onSubmit={submitWithoutReset(formAction)} className="card mt-6 flex flex-col gap-5 p-5 sm:p-6">
         <LogoField currentUrl={business.logo_url} />
 
         <div className="field">
@@ -113,7 +114,7 @@ export function EditBusinessForm({
           <button
             type="button"
             onClick={onCancel}
-            className="action"
+            className="btn btn-secondary"
           >
             Cancelar
           </button>

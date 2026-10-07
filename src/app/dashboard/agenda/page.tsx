@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendarX2, CircleCheck } from "lucide-react";
 import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
@@ -11,6 +12,8 @@ import {
   OwnerBookingCard,
   type OwnerBookingRow,
 } from "@/components/owner-booking-card";
+
+export const metadata: Metadata = { title: "Agenda" };
 
 const BOOKING_COLUMNS =
   "id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address";

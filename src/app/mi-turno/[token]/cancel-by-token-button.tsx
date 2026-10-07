@@ -9,7 +9,8 @@ export function CancelByTokenButton({ token }: { token: string }) {
 
   if (confirming) {
     return (
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-sm font-medium">¿Seguro que querés cancelarlo?</span>
         <button
           type="button"
           disabled={isPending}
@@ -18,17 +19,17 @@ export function CancelByTokenButton({ token }: { token: string }) {
               await cancelBookingByToken(token);
             })
           }
-          className="action-danger"
+          className="btn btn-danger btn-sm"
         >
-          Confirmar cancelación
+          Sí, cancelar
         </button>
         <button
           type="button"
           disabled={isPending}
           onClick={() => setConfirming(false)}
-          className="action"
+          className="btn btn-secondary btn-sm"
         >
-          Volver
+          No
         </button>
       </div>
     );
@@ -38,7 +39,7 @@ export function CancelByTokenButton({ token }: { token: string }) {
     <button
       type="button"
       onClick={() => setConfirming(true)}
-      className="action-danger"
+      className="btn btn-danger"
     >
       Cancelar turno
     </button>

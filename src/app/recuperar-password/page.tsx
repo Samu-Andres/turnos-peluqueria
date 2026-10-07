@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { requestPasswordReset, type AuthFormState } from "@/lib/actions/auth";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialState: AuthFormState = { error: null };
 
@@ -21,7 +22,7 @@ export default function RecuperarPasswordPage() {
         </p>
       </div>
 
-      <form action={formAction} className="card flex flex-col gap-4 p-5 sm:p-6">
+      <form onSubmit={submitWithoutReset(formAction)} className="card flex flex-col gap-4 p-5 sm:p-6">
         <div className="field">
           <label htmlFor="email" className="label">
             Email

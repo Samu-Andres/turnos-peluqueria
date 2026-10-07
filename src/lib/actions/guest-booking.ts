@@ -84,7 +84,8 @@ export async function rescheduleBookingByToken(
     if (error.code === "23P01") {
       return { error: "Justo se ocupó ese horario, elegí otro." };
     }
-    return { error: error.message };
+    console.error("rescheduleBookingByToken:", error);
+    return { error: "No pudimos reprogramar el turno, probá de nuevo." };
   }
   if (!ok) {
     return { error: "Ese turno ya no se puede reprogramar." };

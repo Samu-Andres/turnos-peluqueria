@@ -134,7 +134,11 @@ export async function createBusiness(
   });
 
   if (error) {
-    return { error: error.message };
+    console.error("createBusiness:", error);
+    if (error.code === "23505") {
+      return { error: "Ya existe un negocio con un nombre muy parecido. Probá con otro nombre." };
+    }
+    return { error: "No pudimos crear el negocio, probá de nuevo." };
   }
 
   revalidatePath("/dashboard");
@@ -190,7 +194,8 @@ export async function updateBusiness(
     .eq("owner_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("updateBusiness:", error);
+    return { error: "No pudimos guardar los cambios, probá de nuevo." };
   }
 
   revalidatePath("/dashboard");

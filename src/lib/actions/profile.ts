@@ -39,7 +39,8 @@ export async function updateProfile(
     .eq("id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("updateProfile:", error);
+    return { error: "No pudimos guardar tus datos, probá de nuevo." };
   }
 
   revalidatePath("/mi-perfil");

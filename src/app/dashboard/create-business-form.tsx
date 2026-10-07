@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { createBusiness, type BusinessFormState } from "@/lib/actions/business";
 import { LogoField } from "@/components/logo-field";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialState: BusinessFormState = { error: null };
 
@@ -14,14 +15,14 @@ export function CreateBusinessForm({
   const [state, formAction, pending] = useActionState(createBusiness, initialState);
 
   return (
-    <div className="mx-auto max-w-sm">
+    <div className="mx-auto max-w-lg">
       <h1 className="page-title">Creá tu negocio</h1>
       <p className="mt-1 text-sm text-muted">
         Esto arma la página pública donde tus clientes van a poder reservar
         turnos.
       </p>
 
-      <form action={formAction} className="mt-6 flex flex-col gap-4">
+      <form onSubmit={submitWithoutReset(formAction)} className="card mt-6 flex flex-col gap-5 p-5 sm:p-6">
         <LogoField />
 
         <div className="field">

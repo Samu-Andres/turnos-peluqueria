@@ -44,3 +44,4 @@ supabaseINFo
 # archivos de herramientas de IA (autogenerados por next dev / editores)
 AGENTS.md
 CLAUDE.md
+.claude/

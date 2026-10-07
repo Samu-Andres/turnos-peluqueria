@@ -5,6 +5,7 @@ import {
   completeStaffRegistration,
   type StaffOnboardingFormState,
 } from "@/lib/actions/staff-onboarding";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialState: StaffOnboardingFormState = { error: null };
 
@@ -15,7 +16,7 @@ export function CompleteRegistrationForm() {
   );
 
   return (
-    <form action={formAction} className="card flex flex-col gap-4 p-5 sm:p-6">
+    <form onSubmit={submitWithoutReset(formAction)} className="card flex flex-col gap-4 p-5 sm:p-6">
       <div className="field">
         <label htmlFor="password" className="label">
           Contraseña

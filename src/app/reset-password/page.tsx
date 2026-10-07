@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { updatePassword, type AuthFormState } from "@/lib/actions/auth";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialState: AuthFormState = { error: null };
 
@@ -17,7 +18,7 @@ export default function ResetPasswordPage() {
         <h1 className="page-title">Elegí tu nueva contraseña</h1>
       </div>
 
-      <form action={formAction} className="card flex flex-col gap-4 p-5 sm:p-6">
+      <form onSubmit={submitWithoutReset(formAction)} className="card flex flex-col gap-4 p-5 sm:p-6">
         <div className="field">
           <label htmlFor="password" className="label">
             Nueva contraseña

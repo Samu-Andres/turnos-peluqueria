@@ -1,5 +1,6 @@
 "use client";
 
+import { ImageIcon, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { deleteBusinessPhoto } from "@/lib/actions/business-photos";
 import type { BusinessPhoto } from "@/types/database";
@@ -9,42 +10,42 @@ function PhotoTile({ photo }: { photo: BusinessPhoto }) {
   const [confirming, setConfirming] = useState(false);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="group relative overflow-hidden rounded-xl border border-border bg-surface-sunken">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={photo.url}
-        alt=""
-        className="h-28 w-full rounded-lg border border-border object-cover"
-      />
+      <img src={photo.url} alt="" loading="lazy" className="aspect-square w-full object-cover" />
 
-      {confirming ? (
-        <div className="flex items-center gap-2 text-xs">
+      <div className="absolute inset-x-0 bottom-0 flex justify-end gap-1.5 bg-gradient-to-t from-black/60 to-transparent p-2 pt-8">
+        {confirming ? (
+          <>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => setConfirming(false)}
+              className="btn btn-secondary btn-sm"
+            >
+              No
+            </button>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => startTransition(() => deleteBusinessPhoto(photo.id))}
+              className="btn btn-sm bg-danger text-white hover:bg-danger/90"
+            >
+              {isPending ? "Borrando..." : "Sí, borrar"}
+            </button>
+          </>
+        ) : (
           <button
             type="button"
-            disabled={isPending}
-            onClick={() => startTransition(() => deleteBusinessPhoto(photo.id))}
-            className="font-medium text-danger underline disabled:opacity-60"
+            onClick={() => setConfirming(true)}
+            aria-label="Borrar foto"
+            title="Borrar foto"
+            className="btn btn-secondary btn-sm !min-h-9 !px-2.5"
           >
-            Confirmar
+            <Trash2 aria-hidden className="h-4 w-4" />
           </button>
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={() => setConfirming(false)}
-            className="action"
-          >
-            Cancelar
-          </button>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setConfirming(true)}
-          className="self-start text-xs text-muted underline decoration-muted/40 underline-offset-2 hover:text-accent"
-        >
-          Borrar
-        </button>
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -52,7 +53,13 @@ function PhotoTile({ photo }: { photo: BusinessPhoto }) {
 export function PhotoGrid({ photos }: { photos: BusinessPhoto[] }) {
   if (photos.length === 0) {
     return (
-      <p className="mt-6 text-sm text-muted">Todavía no subiste ninguna foto.</p>
+      <div className="mt-6 flex flex-col items-center rounded-2xl border border-dashed border-border-strong p-8 text-center">
+        <ImageIcon aria-hidden className="h-8 w-8 text-muted" />
+        <p className="mt-3 font-semibold">Todavía no subiste fotos</p>
+        <p className="mt-1 text-sm text-muted">
+          Los negocios con fotos generan más confianza al reservar.
+        </p>
+      </div>
     );
   }
 

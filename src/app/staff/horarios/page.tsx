@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requireStaffSelf } from "@/lib/dashboard/require-staff-access";
 import { saveWorkingHours } from "@/lib/actions/working-hours";
 import { WorkingHoursForm } from "@/components/working-hours-form";
+
+export const metadata: Metadata = { title: "Mis horarios" };
 
 export default async function StaffHorariosPage() {
   const { supabase, staff } = await requireStaffSelf();

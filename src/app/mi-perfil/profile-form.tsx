@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { updateProfile, type ProfileFormState } from "@/lib/actions/profile";
 import type { Profile } from "@/types/database";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialState: ProfileFormState = { error: null };
 
@@ -11,7 +12,7 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
   const justSaved = state !== initialState && !state.error;
 
   return (
-    <form action={formAction} className="mt-6 flex flex-col gap-4">
+    <form onSubmit={submitWithoutReset(formAction)} className="card mt-6 flex flex-col gap-5 p-5 sm:p-6">
       <div className="field">
         <label htmlFor="full_name" className="label">
           Nombre completo

@@ -2,10 +2,10 @@
 
 import { useActionState, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { Check, Clock, LoaderCircle } from "lucide-react";
+import { Check, Clock } from "lucide-react";
+import { DateStrip, SlotGrid } from "@/components/booking-pickers";
 import {
   addDaysToDateStr,
-  dateChipPartsAR,
   formatDateLongAR,
   todayInBusinessTZ,
 } from "@/lib/booking/time";
@@ -16,6 +16,7 @@ import {
   type BookingFormState,
 } from "@/lib/actions/booking-flow";
 import type { Service, Staff } from "@/types/database";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialBookingState: BookingFormState = { error: null };
 const DAYS_AHEAD = 14;
@@ -169,30 +170,7 @@ export function BookingFlow({
 
       {serviceId && staffId && (
         <Step number={3} title="Elegí el día" done={Boolean(dateStr)}>
-          <div className="-mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-2">
-            {dateOptions.map((d, i) => {
-              const parts = dateChipPartsAR(d);
-              const selected = dateStr === d;
-              return (
-                <button
-                  key={d}
-                  type="button"
-                  aria-pressed={selected}
-                  aria-label={formatDateLongAR(d)}
-                  onClick={() => setDateStr(d)}
-                  className={`flex w-16 shrink-0 snap-start flex-col items-center gap-0.5 py-2.5 ${
-                    selected ? "option-selected" : "option"
-                  }`}
-                >
-                  <span className="text-xs font-medium capitalize text-muted">
-                    {i === 0 ? "Hoy" : parts.weekday}
-                  </span>
-                  <span className="text-lg font-bold leading-tight">{parts.day}</span>
-                  <span className="text-xs capitalize text-muted">{parts.month}</span>
-                </button>
-              );
-            })}
-          </div>
+          <DateStrip dates={dateOptions} value={dateStr} onChange={setDateStr} />
         </Step>
       )}
 
@@ -202,38 +180,13 @@ export function BookingFlow({
             {formatDateLongAR(dateStr)}
           </p>
 
-          {isPending && (
-            <p className="flex items-center gap-2 text-sm text-muted" role="status">
-              <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
-              Buscando horarios...
-            </p>
-          )}
-
-          {!isPending && slotsError && <p className="form-error">{slotsError}</p>}
-
-          {!isPending && !slotsError && slots && slots.length === 0 && (
-            <p className="rounded-xl bg-surface-sunken px-4 py-3 text-sm text-muted">
-              No hay horarios libres ese día, probá con otra fecha.
-            </p>
-          )}
-
-          {!isPending && slots && slots.length > 0 && (
-            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-              {slots.map((slot) => (
-                <button
-                  key={slot}
-                  type="button"
-                  aria-pressed={time === slot}
-                  onClick={() => setTime(slot)}
-                  className={`min-h-11 tabular-nums ${
-                    time === slot ? "option-selected" : "option"
-                  }`}
-                >
-                  {slot}
-                </button>
-              ))}
-            </div>
-          )}
+          <SlotGrid
+            slots={slots}
+            value={time}
+            onChange={setTime}
+            loading={isPending}
+            error={slotsError}
+          />
         </Step>
       )}
 
@@ -351,7 +304,7 @@ function ConfirmStep({
         </dl>
 
         <div className="px-5 py-5">
-      <form action={formAction} className="flex flex-col gap-4">
+      <form onSubmit={submitWithoutReset(formAction)} className="flex flex-col gap-4">
         <input type="hidden" name="date" value={dateStr} />
         <input type="hidden" name="time" value={time} />
 

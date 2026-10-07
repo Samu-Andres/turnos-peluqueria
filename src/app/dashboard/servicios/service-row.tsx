@@ -8,6 +8,7 @@ import {
 } from "@/lib/actions/services";
 import { formatPrice } from "@/lib/format";
 import type { Service } from "@/types/database";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 export function ServiceRow({ service }: { service: Service }) {
   const [isPending, startTransition] = useTransition();
@@ -31,7 +32,7 @@ export function ServiceRow({ service }: { service: Service }) {
   if (editing) {
     return (
       <li className="card px-4 py-4">
-        <form action={handleSave} className="flex flex-col gap-3">
+        <form onSubmit={submitWithoutReset(handleSave)} className="flex flex-col gap-3">
           <div className="field">
             <label className="label">Nombre</label>
             <input

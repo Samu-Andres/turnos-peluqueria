@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendarPlus } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -5,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDateTimeLongAR, formatTimeAR } from "@/lib/booking/time";
 import { CancelBookingButton } from "./cancel-booking-button";
 import { STATUS_LABELS, statusBadgeClass } from "@/lib/booking/status-styles";
+
+export const metadata: Metadata = { title: "Mis turnos" };
 
 export default async function MisTurnosPage({
   searchParams,

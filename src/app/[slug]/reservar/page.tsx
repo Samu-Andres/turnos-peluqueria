@@ -67,8 +67,24 @@ export default async function ReservarPage({
         ← Volver a {business.name}
       </Link>
 
-      <h1 className="page-title mt-4">Reservar turno</h1>
-      <p className="mt-1 text-sm text-muted">{business.name}</p>
+      <div className="mt-4 flex items-center gap-3">
+        {business.logo_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={business.logo_url}
+            alt=""
+            className="h-12 w-12 shrink-0 rounded-xl border border-border object-cover"
+          />
+        ) : (
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-lg font-bold text-accent">
+            {business.name.charAt(0).toUpperCase()}
+          </span>
+        )}
+        <div>
+          <h1 className="page-title">Reservar turno</h1>
+          <p className="text-sm text-muted">{business.name}</p>
+        </div>
+      </div>
 
       {services && services.length > 0 && staff && staff.length > 0 ? (
         <BookingFlow
@@ -85,7 +101,7 @@ export default async function ReservarPage({
           servesAtHome={business.serves_at_home}
         />
       ) : (
-        <p className="mt-8 text-sm text-muted">
+        <p className="alert-warning mt-8">
           Este negocio todavía no tiene turnos disponibles para reservar
           online.
         </p>

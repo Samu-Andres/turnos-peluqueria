@@ -18,9 +18,21 @@ export async function generateMetadata({
   const { slug } = await params;
   const business = await getBusinessBySlug(slug);
 
+  if (!business) {
+    return { title: "Peluquería no encontrada" };
+  }
+
+  const description =
+    business.description ?? `Reservá tu turno en ${business.name} online, en dos clics.`;
+
   return {
-    title: business ? `${business.name} — Turnos Peluquería` : "Turnos Peluquería",
-    description: business?.description ?? "Reservá tu turno online.",
+    title: `${business.name} · Reservá tu turno`,
+    description,
+    openGraph: {
+      title: business.name,
+      description,
+      images: business.logo_url ? [{ url: business.logo_url }] : undefined,
+    },
   };
 }
 

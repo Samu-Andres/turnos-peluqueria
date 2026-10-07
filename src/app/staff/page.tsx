@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendarDays, ChevronRight, Clock } from "lucide-react";
 import { requireStaffSelf } from "@/lib/dashboard/require-staff-access";
+
+export const metadata: Metadata = { title: "Mi agenda" };
 
 export default async function StaffHomePage() {
   const { business, staff } = await requireStaffSelf();

@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { Check, Plus } from "lucide-react";
 import { createService, type ServiceFormState } from "@/lib/actions/services";
+import { submitWithoutReset } from "@/lib/submit-without-reset";
 
 const initialState: ServiceFormState = { error: null };
 
@@ -42,7 +43,7 @@ export function ServiceForm({ existingNames = [] }: { existingNames?: string[] }
   return (
     <form
       ref={formRef}
-      action={formAction}
+      onSubmit={submitWithoutReset(formAction)}
       className="mt-4 flex flex-col gap-5"
     >
       <fieldset className="flex flex-col gap-2">

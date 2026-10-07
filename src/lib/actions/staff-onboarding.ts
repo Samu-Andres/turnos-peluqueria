@@ -38,7 +38,10 @@ export async function completeStaffRegistration(
   const { error } = await supabase.auth.updateUser({ password });
 
   if (error) {
-    return { error: error.message };
+    if (error.code === "weak_password") {
+      return { error: "Elegí una contraseña más segura." };
+    }
+    return { error: "No pudimos guardar la contraseña, probá de nuevo." };
   }
 
   redirect("/staff");

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBusinessMetrics } from "@/lib/dashboard/metrics";
@@ -8,6 +9,8 @@ import {
 } from "@/lib/booking/time";
 import { BusinessPanel } from "./business-panel";
 import { CreateBusinessForm } from "./create-business-form";
+
+export const metadata: Metadata = { title: "Mi negocio" };
 
 export default async function DashboardPage({
   searchParams,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ImagePlus } from "lucide-react";
 
 export function LogoField({ currentUrl }: { currentUrl?: string | null }) {
   const [preview, setPreview] = useState<string | null>(currentUrl ?? null);
@@ -11,14 +12,12 @@ export function LogoField({ currentUrl }: { currentUrl?: string | null }) {
         Logo {currentUrl ? "" : "(opcional)"}
       </label>
       <div className="flex items-center gap-3">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-surface">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border-strong bg-surface-sunken text-muted">
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="" className="h-full w-full object-cover" />
           ) : (
-            <span className="px-1 text-center text-[10px] leading-tight text-muted">
-              Sin logo
-            </span>
+            <ImagePlus aria-hidden className="h-6 w-6" />
           )}
         </div>
         <input
@@ -32,10 +31,10 @@ export function LogoField({ currentUrl }: { currentUrl?: string | null }) {
               setPreview(URL.createObjectURL(file));
             }
           }}
-          className="block flex-1 text-sm text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-foreground file:transition-colors hover:file:border-accent"
+          className="block min-w-0 flex-1 cursor-pointer text-sm text-muted file:mr-3 file:min-h-10 file:cursor-pointer file:rounded-lg file:border-0 file:bg-accent-soft file:px-3.5 file:text-sm file:font-semibold file:text-accent"
         />
       </div>
-      <p className="text-xs text-muted">
+      <p className="hint">
         PNG, JPG, WEBP o SVG. Hasta 3 MB.
         {currentUrl ? " Dejalo vacío para mantener el logo actual." : ""}
       </p>
