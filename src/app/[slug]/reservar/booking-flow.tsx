@@ -2,7 +2,13 @@
 
 import { useActionState, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { addDaysToDateStr, formatDateLongAR, todayInBusinessTZ } from "@/lib/booking/time";
+import { Check, Clock, LoaderCircle } from "lucide-react";
+import {
+  addDaysToDateStr,
+  dateChipPartsAR,
+  formatDateLongAR,
+  todayInBusinessTZ,
+} from "@/lib/booking/time";
 import { formatPrice } from "@/lib/format";
 import {
   createBooking,
@@ -100,116 +106,127 @@ export function BookingFlow({
     return createBooking.bind(null, businessId, serviceId, staffId, slug);
   }, [businessId, serviceId, staffId, slug]);
 
+  const staffPerson = staff.find((p) => p.id === staffId) ?? null;
+
   return (
-    <div className="mt-8 flex flex-col gap-8">
-      <section>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          1. Elegí el servicio
-        </h2>
-        <div className="mt-3 flex flex-col gap-2">
+    <ol className="mt-8 flex flex-col">
+      <Step number={1} title="Elegí el servicio" done={Boolean(service)}>
+        <div className="flex flex-col gap-2">
           {services.map((s) => (
             <button
               key={s.id}
               type="button"
+              aria-pressed={serviceId === s.id}
               onClick={() => setServiceId(s.id)}
-              className={`flex items-center justify-between gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors ${
-                serviceId === s.id
-                  ? "border-accent bg-accent text-accent-foreground"
-                  : "border-border bg-surface hover:border-border-strong"
+              className={`flex min-h-14 items-center justify-between gap-3 px-4 py-3 text-left ${
+                serviceId === s.id ? "option-selected" : "option"
               }`}
             >
-              <span className="font-medium">{s.name}</span>
-              <span
-                className={`shrink-0 ${
-                  serviceId === s.id ? "text-accent-foreground/70" : "text-muted"
-                }`}
-              >
-                {s.duration_minutes} min · {formatPrice(s.price)}
+              <span className="font-semibold">{s.name}</span>
+              <span className="flex shrink-0 items-center gap-3 text-muted">
+                <span className="inline-flex items-center gap-1">
+                  <Clock aria-hidden className="h-3.5 w-3.5" />
+                  {s.duration_minutes} min
+                </span>
+                <span className="font-semibold text-foreground">
+                  {formatPrice(s.price)}
+                </span>
               </span>
             </button>
           ))}
         </div>
-      </section>
+      </Step>
 
       {serviceId && (
-        <section>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-            2. Elegí con quién
-          </h2>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {staff.map((person) => (
-              <button
-                key={person.id}
-                type="button"
-                onClick={() => setStaffId(person.id)}
-                className={`rounded-lg border px-4 py-2 text-sm font-medium ${
-                  staffId === person.id
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border bg-surface hover:border-border-strong"
-                }`}
-              >
-                {person.full_name}
-              </button>
-            ))}
-          </div>
-        </section>
+        <Step
+          number={2}
+          title="Elegí con quién"
+          done={Boolean(staffPerson)}
+          summary={staff.length === 1 ? staffPerson?.full_name : undefined}
+        >
+          {staff.length > 1 && (
+            <div className="flex flex-wrap gap-2">
+              {staff.map((person) => (
+                <button
+                  key={person.id}
+                  type="button"
+                  aria-pressed={staffId === person.id}
+                  onClick={() => setStaffId(person.id)}
+                  className={`flex min-h-11 items-center gap-2.5 py-2 pl-2 pr-4 ${
+                    staffId === person.id ? "option-selected" : "option"
+                  }`}
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-sunken text-xs font-bold text-muted">
+                    {person.full_name.charAt(0).toUpperCase()}
+                  </span>
+                  {person.full_name}
+                </button>
+              ))}
+            </div>
+          )}
+        </Step>
       )}
 
       {serviceId && staffId && (
-        <section>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-            3. Elegí el día
-          </h2>
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
-            {dateOptions.map((d) => (
-              <button
-                key={d}
-                type="button"
-                onClick={() => setDateStr(d)}
-                className={`shrink-0 whitespace-nowrap rounded-lg border px-3 py-2 text-xs font-medium capitalize ${
-                  dateStr === d
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border bg-surface hover:border-border-strong"
-                }`}
-              >
-                {formatDateLongAR(d)}
-              </button>
-            ))}
+        <Step number={3} title="Elegí el día" done={Boolean(dateStr)}>
+          <div className="-mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-2">
+            {dateOptions.map((d, i) => {
+              const parts = dateChipPartsAR(d);
+              const selected = dateStr === d;
+              return (
+                <button
+                  key={d}
+                  type="button"
+                  aria-pressed={selected}
+                  aria-label={formatDateLongAR(d)}
+                  onClick={() => setDateStr(d)}
+                  className={`flex w-16 shrink-0 snap-start flex-col items-center gap-0.5 py-2.5 ${
+                    selected ? "option-selected" : "option"
+                  }`}
+                >
+                  <span className="text-xs font-medium capitalize text-muted">
+                    {i === 0 ? "Hoy" : parts.weekday}
+                  </span>
+                  <span className="text-lg font-bold leading-tight">{parts.day}</span>
+                  <span className="text-xs capitalize text-muted">{parts.month}</span>
+                </button>
+              );
+            })}
           </div>
-        </section>
+        </Step>
       )}
 
       {serviceId && staffId && dateStr && (
-        <section>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-            4. Elegí el horario
-          </h2>
+        <Step number={4} title="Elegí el horario" done={Boolean(time)}>
+          <p className="-mt-1 mb-3 text-sm capitalize text-muted">
+            {formatDateLongAR(dateStr)}
+          </p>
 
           {isPending && (
-            <p className="mt-3 text-sm text-muted">Buscando horarios...</p>
+            <p className="flex items-center gap-2 text-sm text-muted" role="status">
+              <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
+              Buscando horarios...
+            </p>
           )}
 
-          {!isPending && slotsError && (
-            <p className="mt-3 text-sm text-red-400">{slotsError}</p>
-          )}
+          {!isPending && slotsError && <p className="form-error">{slotsError}</p>}
 
           {!isPending && !slotsError && slots && slots.length === 0 && (
-            <p className="mt-3 text-sm text-muted">
+            <p className="rounded-xl bg-surface-sunken px-4 py-3 text-sm text-muted">
               No hay horarios libres ese día, probá con otra fecha.
             </p>
           )}
 
           {!isPending && slots && slots.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
               {slots.map((slot) => (
                 <button
                   key={slot}
                   type="button"
+                  aria-pressed={time === slot}
                   onClick={() => setTime(slot)}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium ${
-                    time === slot
-                      ? "border-accent bg-accent text-accent-foreground"
-                      : "border-border bg-surface hover:border-border-strong"
+                  className={`min-h-11 tabular-nums ${
+                    time === slot ? "option-selected" : "option"
                   }`}
                 >
                   {slot}
@@ -217,13 +234,14 @@ export function BookingFlow({
               ))}
             </div>
           )}
-        </section>
+        </Step>
       )}
 
       {service && staffId && dateStr && time && boundCreateBooking && (
         <ConfirmStep
           slug={slug}
           service={service}
+          staffName={staffPerson?.full_name ?? null}
           staffId={staffId}
           dateStr={dateStr}
           time={time}
@@ -233,13 +251,58 @@ export function BookingFlow({
           action={boundCreateBooking}
         />
       )}
-    </div>
+    </ol>
+  );
+}
+
+/**
+ * Un paso del flujo: número (o tilde cuando ya está elegido) con una
+ * línea vertical que conecta con el siguiente.
+ */
+function Step({
+  number,
+  title,
+  done,
+  summary,
+  last = false,
+  children,
+}: {
+  number: number;
+  title: string;
+  done: boolean;
+  summary?: string | null;
+  last?: boolean;
+  children?: React.ReactNode;
+}) {
+  return (
+    <li className="relative flex gap-4 pb-8">
+      {!last && (
+        <span aria-hidden className="absolute bottom-0 left-4 top-10 w-px bg-border" />
+      )}
+      <span
+        className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+          done
+            ? "bg-accent text-accent-foreground"
+            : "border border-border-strong bg-surface text-muted"
+        }`}
+      >
+        {done ? <Check aria-hidden className="h-4 w-4" strokeWidth={3} /> : number}
+      </span>
+      <div className="min-w-0 flex-1 pt-1">
+        <h2 className="mb-3 font-semibold">
+          {title}
+          {summary && <span className="font-normal text-muted"> · {summary}</span>}
+        </h2>
+        {children}
+      </div>
+    </li>
   );
 }
 
 function ConfirmStep({
   slug,
   service,
+  staffName,
   staffId,
   dateStr,
   time,
@@ -250,6 +313,7 @@ function ConfirmStep({
 }: {
   slug: string;
   service: Service;
+  staffName: string | null;
   staffId: string;
   dateStr: string;
   time: string;
@@ -263,36 +327,36 @@ function ConfirmStep({
   const nextUrl = `/${slug}/reservar?service=${service.id}&staff=${staffId}&date=${dateStr}&time=${time}`;
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-        5. Confirmá
-      </h2>
+    <Step number={5} title="Confirmá tu turno" done={false} last>
+      <div className="card overflow-hidden">
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 border-b border-border bg-surface-sunken/60 px-5 py-4 text-sm">
+          <div>
+            <dt className="text-xs text-muted">Servicio</dt>
+            <dd className="font-semibold">{service.name}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted">Precio</dt>
+            <dd className="font-semibold">{formatPrice(service.price)}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted">Día</dt>
+            <dd className="font-semibold capitalize">{formatDateLongAR(dateStr)}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted">Horario</dt>
+            <dd className="font-semibold tabular-nums">
+              {time} hs{staffName ? ` · con ${staffName}` : ""}
+            </dd>
+          </div>
+        </dl>
 
-      <dl className="mt-3 flex flex-col gap-1 text-sm">
-        <div className="flex justify-between">
-          <dt className="text-muted">Servicio</dt>
-          <dd className="font-medium">{service.name}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-muted">Fecha</dt>
-          <dd className="font-medium capitalize">{formatDateLongAR(dateStr)}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-muted">Horario</dt>
-          <dd className="font-medium">{time}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-muted">Precio</dt>
-          <dd className="font-medium">{formatPrice(service.price)}</dd>
-        </div>
-      </dl>
-
-      <form action={formAction} className="mt-4 flex flex-col gap-3">
+        <div className="px-5 py-5">
+      <form action={formAction} className="flex flex-col gap-4">
         <input type="hidden" name="date" value={dateStr} />
         <input type="hidden" name="time" value={time} />
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="client_name" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="client_name" className="label">
             Nombre y apellido
           </label>
           <input
@@ -302,12 +366,12 @@ function ConfirmStep({
             required
             defaultValue={prefillName ?? undefined}
             placeholder="Tu nombre completo"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="client_phone" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="client_phone" className="label">
             Teléfono
           </label>
           <input
@@ -317,13 +381,13 @@ function ConfirmStep({
             required
             defaultValue={prefillPhone ?? undefined}
             placeholder="Para que te puedan contactar"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
         {servesAtHome && (
-          <div className="flex flex-col gap-1">
-            <label htmlFor="client_address" className="text-sm font-medium">
+          <div className="field">
+            <label htmlFor="client_address" className="label">
               Tu dirección
             </label>
             <input
@@ -332,7 +396,7 @@ function ConfirmStep({
               type="text"
               required
               placeholder="Calle, número, piso/depto, barrio"
-              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+              className="input"
             />
             <p className="text-xs text-muted">
               Este negocio atiende a domicilio: necesitamos tu dirección
@@ -341,20 +405,20 @@ function ConfirmStep({
           </div>
         )}
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="notes" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="notes" className="label">
             Notas para la peluquería (opcional)
           </label>
           <textarea
             id="notes"
             name="notes"
             rows={2}
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
         {state.error && (
-          <p className="text-sm text-red-400" role="alert">
+          <p className="form-error" role="alert">
             {state.error}
           </p>
         )}
@@ -362,32 +426,34 @@ function ConfirmStep({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+          className="btn btn-primary mt-1 w-full"
         >
-          {pending ? "Reservando..." : "Confirmar turno"}
+          {pending ? "Reservando..." : `Confirmar turno de las ${time}`}
         </button>
       </form>
 
-      {!prefillName && (
-        <p className="mt-3 text-xs text-muted">
-          No hace falta cuenta para reservar. Si querés llevar un registro
-          de tus turnos,{" "}
-          <Link
-            href={`/login?next=${encodeURIComponent(nextUrl)}`}
-            className="text-accent underline decoration-accent/40 underline-offset-2 hover:text-accent-hover"
-          >
-            iniciá sesión
-          </Link>{" "}
-          o{" "}
-          <Link
-            href={`/signup?next=${encodeURIComponent(nextUrl)}`}
-            className="text-accent underline decoration-accent/40 underline-offset-2 hover:text-accent-hover"
-          >
-            creá una cuenta
-          </Link>{" "}
-          (podés hacerlo antes o después de reservar).
-        </p>
-      )}
-    </section>
+        {!prefillName && (
+          <p className="mt-4 text-center text-xs text-muted">
+            No hace falta cuenta para reservar. Si querés llevar un registro
+            de tus turnos,{" "}
+            <Link
+              href={`/login?next=${encodeURIComponent(nextUrl)}`}
+              className="link"
+            >
+              iniciá sesión
+            </Link>{" "}
+            o{" "}
+            <Link
+              href={`/signup?next=${encodeURIComponent(nextUrl)}`}
+              className="link"
+            >
+              creá una cuenta
+            </Link>{" "}
+            (podés hacerlo antes o después de reservar).
+          </p>
+        )}
+        </div>
+      </div>
+    </Step>
   );
 }

@@ -74,7 +74,7 @@ export function RescheduleFlow({
       <p className="text-sm text-muted">{summary}</p>
 
       <div>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
           Nuevo día
         </h2>
         <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
@@ -88,7 +88,7 @@ export function RescheduleFlow({
               }}
               className={`shrink-0 whitespace-nowrap rounded-lg border px-3 py-2 text-xs font-medium capitalize ${
                 dateStr === d
-                  ? "border-accent bg-accent text-accent-foreground"
+                  ? "border-accent bg-accent-soft text-foreground ring-1 ring-accent"
                   : "border-border bg-surface hover:border-border-strong"
               }`}
             >
@@ -100,7 +100,7 @@ export function RescheduleFlow({
 
       {dateStr && (
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
             Nuevo horario
           </h2>
 
@@ -109,7 +109,7 @@ export function RescheduleFlow({
           )}
 
           {!isLoadingSlots && slotsError && (
-            <p className="mt-3 text-sm text-red-400">{slotsError}</p>
+            <p className="form-error mt-3">{slotsError}</p>
           )}
 
           {!isLoadingSlots && !slotsError && slots && slots.length === 0 && (
@@ -127,7 +127,7 @@ export function RescheduleFlow({
                   onClick={() => setTime(slot)}
                   className={`rounded-lg border px-3 py-2 text-sm font-medium ${
                     time === slot
-                      ? "border-accent bg-accent text-accent-foreground"
+                      ? "border-accent bg-accent-soft text-foreground ring-1 ring-accent"
                       : "border-border bg-surface hover:border-border-strong"
                   }`}
                 >
@@ -145,7 +145,7 @@ export function RescheduleFlow({
           <input type="hidden" name="time" value={time} />
 
           {error && (
-            <p className="text-sm text-red-400" role="alert">
+            <p className="form-error" role="alert">
               {error}
             </p>
           )}
@@ -154,7 +154,7 @@ export function RescheduleFlow({
             <button
               type="submit"
               disabled={isSaving}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+              className="btn btn-primary"
             >
               {isSaving ? "Guardando..." : "Confirmar nuevo horario"}
             </button>

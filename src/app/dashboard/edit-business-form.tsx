@@ -18,7 +18,7 @@ export function EditBusinessForm({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Editar negocio</h1>
+      <h1 className="page-title">Editar negocio</h1>
       <p className="mt-1 text-sm text-muted">
         Tu página pública sigue en <code>/{business.slug}</code>, eso no
         cambia aunque edites el nombre.
@@ -27,8 +27,8 @@ export function EditBusinessForm({
       <form action={formAction} className="mt-6 flex flex-col gap-4">
         <LogoField currentUrl={business.logo_url} />
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="name" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="name" className="label">
             Nombre del negocio
           </label>
           <input
@@ -37,12 +37,12 @@ export function EditBusinessForm({
             type="text"
             required
             defaultValue={business.name}
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="address" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="address" className="label">
             Dirección (opcional)
           </label>
           <input
@@ -50,11 +50,11 @@ export function EditBusinessForm({
             name="address"
             type="text"
             defaultValue={business.address ?? ""}
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
-        <label className="flex items-start gap-2 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm">
+        <label className="flex items-start gap-2.5 rounded-xl border border-border bg-surface px-3.5 py-3 text-sm">
           <input
             type="checkbox"
             name="serves_at_home"
@@ -70,8 +70,8 @@ export function EditBusinessForm({
           </span>
         </label>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="phone" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="phone" className="label">
             Teléfono (opcional)
           </label>
           <input
@@ -79,12 +79,12 @@ export function EditBusinessForm({
             name="phone"
             type="tel"
             defaultValue={business.phone ?? ""}
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="description" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="description" className="label">
             Descripción (opcional)
           </label>
           <textarea
@@ -92,12 +92,12 @@ export function EditBusinessForm({
             name="description"
             rows={2}
             defaultValue={business.description ?? ""}
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
         {state.error && (
-          <p className="text-sm text-red-400" role="alert">
+          <p className="form-error" role="alert">
             {state.error}
           </p>
         )}
@@ -106,14 +106,14 @@ export function EditBusinessForm({
           <button
             type="submit"
             disabled={pending}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+            className="btn btn-primary"
           >
             {pending ? "Guardando..." : "Guardar cambios"}
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+            className="action"
           >
             Cancelar
           </button>

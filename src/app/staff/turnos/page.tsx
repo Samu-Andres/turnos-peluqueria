@@ -68,7 +68,7 @@ export default async function StaffTurnosPage({
     return (
       <li
         key={booking.id}
-        className="rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-border-strong"
+        className="card px-4 py-4"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -101,7 +101,7 @@ export default async function StaffTurnosPage({
           {pastBooking && <CompleteBookingButton bookingId={booking.id} />}
           <Link
             href={`/staff/turnos/${booking.id}/reprogramar`}
-            className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+            className="action"
           >
             Reprogramar
           </Link>
@@ -112,24 +112,24 @@ export default async function StaffTurnosPage({
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
+    <main className="page">
       <Link
         href="/staff"
-        className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+        className="back-link"
       >
         ← Volver a tu panel
       </Link>
 
-      <h1 className="mt-4 text-2xl font-bold">Tus turnos</h1>
+      <h1 className="page-title mt-4">Tus turnos</h1>
 
       {reprogramado === "1" && (
-        <p className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+        <p className="alert-success mt-4">
           ¡Listo! Reprogramamos el turno.
         </p>
       )}
 
       <section className="mt-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
           Próximos turnos
         </h2>
 
@@ -146,7 +146,7 @@ export default async function StaffTurnosPage({
 
       {past.length > 0 && (
         <section className="mt-10">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
             Turnos pasados sin cerrar
           </h2>
           <p className="mt-1 text-sm text-muted">
@@ -160,7 +160,7 @@ export default async function StaffTurnosPage({
       )}
 
       <section className="mt-10 border-t border-border pt-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
           Disponibilidad por día
         </h2>
         <DaySchedule staffId={staffId} />

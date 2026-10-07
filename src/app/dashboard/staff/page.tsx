@@ -22,12 +22,12 @@ export default async function StaffPage() {
   const withHours = new Set((hours ?? []).map((h) => h.staff_id));
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
-      <Link href="/dashboard" className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
+    <main className="page">
+      <Link href="/dashboard" className="back-link">
         ← Volver al panel
       </Link>
 
-      <h1 className="mt-4 text-2xl font-bold">Staff de {business.name}</h1>
+      <h1 className="page-title mt-4">Staff de {business.name}</h1>
       <p className="mt-1 text-sm text-muted">
         Las personas que atienden turnos. Desde cada una podés cargar sus
         horarios de disponibilidad.

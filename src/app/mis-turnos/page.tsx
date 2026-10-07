@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CalendarPlus } from "lucide-react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTimeLongAR, formatTimeAR } from "@/lib/booking/time";
@@ -50,29 +51,30 @@ export default async function MisTurnosPage({
   const businessById = new Map((businessesRes.data ?? []).map((b) => [b.id, b]));
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link href="/" className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
-          ← Volver al inicio
-        </Link>
-        <Link href="/mi-perfil" className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
-          Mi perfil
-        </Link>
-      </div>
-
-      <h1 className="mt-4 text-2xl font-bold">Mis turnos</h1>
+    <main className="page">
+      <h1 className="page-title">Mis turnos</h1>
+      <p className="page-subtitle">Tus reservas en todas las peluquerías.</p>
 
       {reservado === "1" && (
-        <p className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+        <p className="alert-success mt-4">
           ¡Listo! Tu turno quedó pendiente de confirmación por el negocio.
         </p>
       )}
 
       <div className="mt-8">
         {rows.length === 0 ? (
-          <p className="text-sm text-muted">
-            Todavía no reservaste ningún turno.
-          </p>
+          <div className="card flex flex-col items-center p-8 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent">
+              <CalendarPlus aria-hidden className="h-6 w-6" />
+            </span>
+            <p className="mt-4 font-semibold">Todavía no reservaste ningún turno</p>
+            <p className="mt-1 text-sm text-muted">
+              Elegí una peluquería y sacá tu primer turno.
+            </p>
+            <Link href="/#peluquerias" className="btn btn-primary mt-5">
+              Buscar peluquería
+            </Link>
+          </div>
         ) : (
           <ul className="flex flex-col gap-3">
             {rows.map((booking) => {
@@ -85,11 +87,11 @@ export default async function MisTurnosPage({
               return (
                 <li
                   key={booking.id}
-                  className="rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-border-strong"
+                  className="card px-4 py-4"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="font-medium">
+                      <p className="font-semibold">
                         {service?.name ?? "Servicio"}
                         {business && ` · ${business.name}`}
                       </p>
@@ -99,7 +101,7 @@ export default async function MisTurnosPage({
                         {staffMember && ` · con ${staffMember.full_name}`}
                       </p>
                       {booking.client_address && (
-                        <p className="mt-1 text-sm text-accent">
+                        <p className="mt-1 text-sm text-muted">
                           Turno a domicilio en: {booking.client_address}
                         </p>
                       )}
@@ -110,10 +112,10 @@ export default async function MisTurnosPage({
                   </div>
 
                   {cancellable && (
-                    <div className="mt-3 flex flex-wrap items-center gap-4">
+                    <div className="-ml-2 mt-3 flex flex-wrap items-center gap-1 border-t border-border pt-3">
                       <Link
                         href={`/mis-turnos/${booking.id}/reprogramar`}
-                        className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+                        className="action"
                       >
                         Reprogramar
                       </Link>

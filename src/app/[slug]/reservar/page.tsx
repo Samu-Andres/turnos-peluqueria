@@ -62,12 +62,12 @@ export default async function ReservarPage({
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
-      <Link href={`/${slug}`} className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent">
+    <main className="page">
+      <Link href={`/${slug}`} className="back-link">
         ← Volver a {business.name}
       </Link>
 
-      <h1 className="mt-4 text-2xl font-bold">Reservar turno</h1>
+      <h1 className="page-title mt-4">Reservar turno</h1>
       <p className="mt-1 text-sm text-muted">{business.name}</p>
 
       {services && services.length > 0 && staff && staff.length > 0 ? (

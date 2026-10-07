@@ -26,8 +26,8 @@ export function ServiceForm() {
       action={formAction}
       className="mt-4 flex flex-col gap-4"
     >
-      <div className="flex flex-col gap-1">
-        <label htmlFor="name" className="text-sm font-medium">
+      <div className="field">
+        <label htmlFor="name" className="label">
           Nombre del servicio
         </label>
         <input
@@ -36,13 +36,13 @@ export function ServiceForm() {
           type="text"
           required
           placeholder="Corte de pelo"
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="input"
         />
       </div>
 
       <div className="flex gap-4">
         <div className="flex flex-1 flex-col gap-1">
-          <label htmlFor="duration_minutes" className="text-sm font-medium">
+          <label htmlFor="duration_minutes" className="label">
             Duración (min)
           </label>
           <input
@@ -53,12 +53,12 @@ export function ServiceForm() {
             step={5}
             required
             placeholder="30"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
         <div className="flex flex-1 flex-col gap-1">
-          <label htmlFor="price" className="text-sm font-medium">
+          <label htmlFor="price" className="label">
             Precio
           </label>
           <input
@@ -69,25 +69,25 @@ export function ServiceForm() {
             step={0.01}
             required
             placeholder="5000"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="description" className="text-sm font-medium">
+      <div className="field">
+        <label htmlFor="description" className="label">
           Descripción (opcional)
         </label>
         <textarea
           id="description"
           name="description"
           rows={2}
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="input"
         />
       </div>
 
       {state.error && (
-        <p className="text-sm text-red-400" role="alert">
+        <p className="form-error" role="alert">
           {state.error}
         </p>
       )}
@@ -95,7 +95,7 @@ export function ServiceForm() {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+        className="btn btn-primary"
       >
         {pending ? "Guardando..." : "Agregar servicio"}
       </button>

@@ -6,8 +6,8 @@ export function LogoField({ currentUrl }: { currentUrl?: string | null }) {
   const [preview, setPreview] = useState<string | null>(currentUrl ?? null);
 
   return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor="logo" className="text-sm font-medium">
+    <div className="field">
+      <label htmlFor="logo" className="label">
         Logo {currentUrl ? "" : "(opcional)"}
       </label>
       <div className="flex items-center gap-3">

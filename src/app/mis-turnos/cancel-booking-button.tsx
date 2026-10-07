@@ -18,7 +18,7 @@ export function CancelBookingButton({ bookingId }: { bookingId: string }) {
               await cancelBooking(bookingId);
             })
           }
-          className="text-sm font-medium text-red-400 underline disabled:opacity-60"
+          className="action-danger"
         >
           Confirmar cancelación
         </button>
@@ -26,7 +26,7 @@ export function CancelBookingButton({ bookingId }: { bookingId: string }) {
           type="button"
           disabled={isPending}
           onClick={() => setConfirming(false)}
-          className="text-sm text-muted underline"
+          className="action"
         >
           Volver
         </button>
@@ -38,7 +38,7 @@ export function CancelBookingButton({ bookingId }: { bookingId: string }) {
     <button
       type="button"
       onClick={() => setConfirming(true)}
-      className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+      className="action-danger"
     >
       Cancelar turno
     </button>

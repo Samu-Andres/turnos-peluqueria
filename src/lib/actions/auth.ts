@@ -84,7 +84,19 @@ export async function signUp(
   });
 
   if (error) {
-    return { error: error.message };
+    if (error.code === "over_email_send_rate_limit") {
+      return {
+        error:
+          "Ahora mismo no podemos mandar el mail de confirmación. Probá de nuevo en un rato.",
+      };
+    }
+    if (error.code === "user_already_exists" || error.code === "email_exists") {
+      return { error: "Ese email ya tiene una cuenta. Iniciá sesión." };
+    }
+    if (error.code === "weak_password") {
+      return { error: "Elegí una contraseña más segura." };
+    }
+    return { error: "No pudimos crear la cuenta, probá de nuevo." };
   }
 
   // Si el proyecto de Supabase tiene "Confirm email" activado, signUp no

@@ -12,8 +12,8 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
 
   return (
     <form action={formAction} className="mt-6 flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="full_name" className="text-sm font-medium">
+      <div className="field">
+        <label htmlFor="full_name" className="label">
           Nombre completo
         </label>
         <input
@@ -22,12 +22,12 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
           type="text"
           required
           defaultValue={profile?.full_name ?? ""}
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="input"
         />
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="phone" className="text-sm font-medium">
+      <div className="field">
+        <label htmlFor="phone" className="label">
           Teléfono
         </label>
         <input
@@ -36,12 +36,12 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
           type="tel"
           defaultValue={profile?.phone ?? ""}
           placeholder="Para precargarlo al reservar un turno"
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="input"
         />
       </div>
 
       {state.error && (
-        <p className="text-sm text-red-400" role="alert">
+        <p className="form-error" role="alert">
           {state.error}
         </p>
       )}
@@ -50,12 +50,12 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+          className="btn btn-primary"
         >
           {pending ? "Guardando..." : "Guardar cambios"}
         </button>
         {justSaved && (
-          <span className="text-sm text-emerald-400">¡Guardado!</span>
+          <span className="text-sm text-success">¡Guardado!</span>
         )}
       </div>
     </form>

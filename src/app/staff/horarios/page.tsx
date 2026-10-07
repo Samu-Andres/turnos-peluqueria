@@ -15,15 +15,15 @@ export default async function StaffHorariosPage() {
   const action = saveWorkingHours.bind(null, staff.id);
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
+    <main className="page">
       <Link
         href="/staff"
-        className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+        className="back-link"
       >
         ← Volver a tu panel
       </Link>
 
-      <h1 className="mt-4 text-2xl font-bold">Tus horarios</h1>
+      <h1 className="page-title mt-4">Tus horarios</h1>
       <p className="mt-1 text-sm text-muted">
         Tildá los días que trabajás y definí el horario. Los clientes solo
         van a poder reservar turnos dentro de estos rangos.

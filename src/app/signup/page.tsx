@@ -15,23 +15,23 @@ function SignupForm() {
   const next = searchParams.get("next");
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4 sm:px-6">
+    <main className="page-narrow">
       <div>
-        <h1 className="text-2xl font-bold">Crear cuenta</h1>
+        <h1 className="page-title">Crear cuenta</h1>
         <p className="mt-1 text-sm text-muted">
           Elegí si vas a reservar turnos o si administrás una peluquería.
         </p>
       </div>
 
-      <form action={formAction} className="flex flex-col gap-4">
+      <form action={formAction} className="card flex flex-col gap-4 p-5 sm:p-6">
         {next && <input type="hidden" name="next" value={next} />}
 
         <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de cuenta">
           <label
-            className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm font-medium ${
+            className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl border px-3 py-2 text-center text-sm font-semibold transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent ${
               role === "client"
-                ? "border-accent bg-accent text-accent-foreground"
-                : "border-border text-muted"
+                ? "border-accent bg-accent-soft text-foreground ring-1 ring-accent"
+                : "border-border bg-surface text-muted hover:border-border-strong"
             }`}
           >
             <input
@@ -46,10 +46,10 @@ function SignupForm() {
           </label>
 
           <label
-            className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm font-medium ${
+            className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl border px-3 py-2 text-center text-sm font-semibold transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent ${
               role === "owner"
-                ? "border-accent bg-accent text-accent-foreground"
-                : "border-border text-muted"
+                ? "border-accent bg-accent-soft text-foreground ring-1 ring-accent"
+                : "border-border bg-surface text-muted hover:border-border-strong"
             }`}
           >
             <input
@@ -65,14 +65,14 @@ function SignupForm() {
         </div>
 
         {role === "owner" && (
-          <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface px-3 py-3">
+          <div className="flex flex-col gap-2 rounded-xl bg-surface-sunken p-3">
             <p className="text-sm font-medium">¿Tenés local o vas a domicilio?</p>
             <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de negocio">
               <label
-                className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm font-medium ${
+                className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl border px-3 py-2 text-center text-sm font-semibold transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent ${
                   businessType === "local"
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border text-muted"
+                    ? "border-accent bg-accent-soft text-foreground ring-1 ring-accent"
+                    : "border-border bg-surface text-muted hover:border-border-strong"
                 }`}
               >
                 <input
@@ -86,10 +86,10 @@ function SignupForm() {
                 Tengo local
               </label>
               <label
-                className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm font-medium ${
+                className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl border px-3 py-2 text-center text-sm font-semibold transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent ${
                   businessType === "domicilio"
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border text-muted"
+                    ? "border-accent bg-accent-soft text-foreground ring-1 ring-accent"
+                    : "border-border bg-surface text-muted hover:border-border-strong"
                 }`}
               >
                 <input
@@ -109,8 +109,8 @@ function SignupForm() {
           </div>
         )}
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="full_name" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="full_name" className="label">
             Nombre completo
           </label>
           <input
@@ -119,12 +119,12 @@ function SignupForm() {
             type="text"
             required
             autoComplete="name"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="email" className="label">
             Email
           </label>
           <input
@@ -133,12 +133,12 @@ function SignupForm() {
             type="email"
             required
             autoComplete="email"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="password" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="password" className="label">
             Contraseña
           </label>
           <input
@@ -148,12 +148,12 @@ function SignupForm() {
             required
             minLength={6}
             autoComplete="new-password"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
         {state.error && (
-          <p className="text-sm text-red-400" role="alert">
+          <p className="form-error" role="alert">
             {state.error}
           </p>
         )}
@@ -161,7 +161,7 @@ function SignupForm() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+          className="btn btn-primary"
         >
           {pending ? "Creando cuenta..." : "Crear cuenta"}
         </button>
@@ -171,7 +171,7 @@ function SignupForm() {
         ¿Ya tenés cuenta?{" "}
         <Link
           href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
-          className="font-medium text-accent underline decoration-accent/40 underline-offset-2 hover:text-accent-hover"
+          className="link"
         >
           Iniciá sesión
         </Link>

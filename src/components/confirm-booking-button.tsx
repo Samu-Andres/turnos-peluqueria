@@ -15,7 +15,7 @@ export function ConfirmBookingButton({ bookingId }: { bookingId: string }) {
           await confirmBooking(bookingId);
         })
       }
-      className="text-sm font-medium text-emerald-400 underline disabled:opacity-60"
+      className="action !text-success hover:!bg-success-soft"
     >
       Confirmar turno
     </button>

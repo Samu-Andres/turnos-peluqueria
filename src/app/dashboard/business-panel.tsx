@@ -2,6 +2,21 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import {
+  CalendarCheck,
+  Check,
+  ChevronRight,
+  Copy,
+  ExternalLink,
+  ImageIcon,
+  Pencil,
+  Scissors,
+  Star,
+  TriangleAlert,
+  Users,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import { EditBusinessForm } from "./edit-business-form";
 import { formatPrice } from "@/lib/format";
 import { useOrigin } from "@/lib/use-origin";
@@ -38,98 +53,166 @@ export function BusinessPanel({
     );
   }
 
+  const tiles = [
+    {
+      href: "/dashboard/staff",
+      icon: Users,
+      title: "Staff, horarios y turnos",
+      text: "Quién atiende, cuándo trabaja y su agenda.",
+    },
+    {
+      href: "/dashboard/servicios",
+      icon: Scissors,
+      title: "Servicios",
+      text: "Qué ofrecés, cuánto dura y cuánto sale.",
+    },
+    {
+      href: "/dashboard/fotos",
+      icon: ImageIcon,
+      title: "Fotos",
+      text: "Mostrá el local y tus trabajos.",
+    },
+  ];
+
   return (
-    <div>
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          {business.logo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={business.logo_url}
-              alt=""
-              className="h-12 w-12 shrink-0 rounded-lg border border-border object-cover"
-            />
-          ) : null}
-          <h1 className="text-2xl font-bold">{business.name}</h1>
+    <div className="flex flex-col gap-6">
+      <section className="card p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-4">
+            {business.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={business.logo_url}
+                alt=""
+                className="h-14 w-14 shrink-0 rounded-xl border border-border object-cover"
+              />
+            ) : (
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-xl font-bold text-accent">
+                {business.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+            <div className="min-w-0">
+              <h1 className="page-title truncate">{business.name}</h1>
+              {(business.address || business.phone) && (
+                <p className="truncate text-sm text-muted">
+                  {[business.address, business.phone].filter(Boolean).join(" · ")}
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="btn btn-secondary btn-sm shrink-0"
+          >
+            <Pencil aria-hidden className="h-3.5 w-3.5" />
+            Editar
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          className="shrink-0 text-sm font-medium text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
-        >
-          Editar
-        </button>
-      </div>
-      <div className="mt-1 flex flex-wrap items-center gap-2">
-        <p className="text-sm text-muted">
-          Tu página pública: <code>{publicUrl}</code>
-        </p>
-        <button
-          type="button"
-          onClick={handleCopyUrl}
-          className="shrink-0 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted transition-colors hover:border-accent hover:text-accent"
-        >
-          {copied ? "¡Copiado!" : "Copiar"}
-        </button>
-      </div>
+
+        {business.description && (
+          <p className="mt-4 text-sm text-muted">{business.description}</p>
+        )}
+
+        <div className="mt-5 flex flex-col gap-2 rounded-xl bg-surface-sunken p-3 sm:flex-row sm:items-center">
+          <p className="min-w-0 flex-1 truncate text-sm">
+            <span className="text-muted">Tu página: </span>
+            <span className="font-medium">{publicUrl}</span>
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleCopyUrl}
+              className="btn btn-secondary btn-sm flex-1 sm:flex-none"
+            >
+              {copied ? (
+                <Check aria-hidden className="h-3.5 w-3.5" />
+              ) : (
+                <Copy aria-hidden className="h-3.5 w-3.5" />
+              )}
+              {copied ? "¡Copiado!" : "Copiar link"}
+            </button>
+            <Link
+              href={`/${business.slug}`}
+              target="_blank"
+              className="btn btn-secondary btn-sm flex-1 sm:flex-none"
+            >
+              <ExternalLink aria-hidden className="h-3.5 w-3.5" />
+              Ver
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {setupSteps.length > 0 && (
-        <div className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm">
-          <p className="font-medium text-amber-400">
-            Tus clientes todavía no pueden reservar. Te falta:
-          </p>
-          <ul className="mt-1 list-inside list-disc text-amber-400/90">
-            {setupSteps.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ul>
-        </div>
+        <section className="alert-warning flex gap-3">
+          <TriangleAlert aria-hidden className="mt-0.5 h-5 w-5 shrink-0" />
+          <div>
+            <p className="font-semibold">
+              Tus clientes todavía no pueden reservar. Te falta:
+            </p>
+            <ul className="mt-1 list-inside list-disc">
+              {setupSteps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
       )}
 
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-lg border border-border bg-surface px-2 py-3 text-center">
-          <p className="text-xl font-bold text-accent">{metrics.bookingsThisMonth}</p>
-          <p className="mt-1 text-xs text-muted">Turnos este mes</p>
+      <section>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+          Este mes
+        </h2>
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <Stat icon={CalendarCheck} label="Turnos confirmados" value={String(metrics.bookingsThisMonth)} />
+          <Stat icon={Star} label="Servicio más pedido" value={metrics.topServiceName ?? "—"} />
+          <Stat icon={Wallet} label="Facturación estimada" value={formatPrice(metrics.estimatedRevenue)} />
         </div>
-        <div className="rounded-lg border border-border bg-surface px-2 py-3 text-center">
-          <p className="truncate text-sm font-bold text-accent" title={metrics.topServiceName ?? undefined}>
-            {metrics.topServiceName ?? "—"}
-          </p>
-          <p className="mt-1 text-xs text-muted">Más pedido</p>
-        </div>
-        <div className="rounded-lg border border-border bg-surface px-2 py-3 text-center">
-          <p className="truncate text-sm font-bold text-accent">
-            {formatPrice(metrics.estimatedRevenue)}
-          </p>
-          <p className="mt-1 text-xs text-muted">Facturación estimada</p>
-        </div>
-      </div>
+      </section>
 
-      {business.description && (
-        <p className="mt-3 text-sm">{business.description}</p>
-      )}
-      {business.address && <p className="mt-4 text-sm">{business.address}</p>}
-      {business.phone && <p className="text-sm">{business.phone}</p>}
+      <nav aria-label="Administrar negocio" className="grid gap-3 sm:grid-cols-3">
+        {tiles.map(({ href, icon: Icon, title, text }) => (
+          <Link key={href} href={href} className="card-interactive group flex flex-col gap-3 p-5">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent">
+              <Icon aria-hidden className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="flex items-center gap-1 font-semibold">
+                {title}
+                <ChevronRight
+                  aria-hidden
+                  className="h-4 w-4 text-muted transition-colors group-hover:text-accent"
+                />
+              </p>
+              <p className="mt-0.5 text-sm text-muted">{text}</p>
+            </div>
+          </Link>
+        ))}
+      </nav>
+    </div>
+  );
+}
 
-      <div className="mt-8 flex flex-col gap-3">
-        <Link
-          href="/dashboard/fotos"
-          className="rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:bg-surface-hover"
-        >
-          Fotos →
-        </Link>
-        <Link
-          href="/dashboard/servicios"
-          className="rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:bg-surface-hover"
-        >
-          Servicios →
-        </Link>
-        <Link
-          href="/dashboard/staff"
-          className="rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:bg-surface-hover"
-        >
-          Staff →
-        </Link>
+function Stat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="card flex items-center gap-3 p-4">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-sunken text-muted">
+        <Icon aria-hidden className="h-5 w-5" />
+      </span>
+      <div className="min-w-0">
+        <p className="truncate text-lg font-bold" title={value}>
+          {value}
+        </p>
+        <p className="text-xs text-muted">{label}</p>
       </div>
     </div>
   );

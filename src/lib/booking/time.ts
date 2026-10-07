@@ -86,6 +86,24 @@ export function formatDateLongAR(dateStr: string): string {
   }).format(date);
 }
 
+/** "2026-09-25" -> { weekday: "vie", day: "25", month: "sep" }, para los chips de día. */
+export function dateChipPartsAR(dateStr: string): {
+  weekday: string;
+  day: string;
+  month: string;
+} {
+  const date = new Date(`${dateStr}T12:00:00${BUSINESS_TZ_OFFSET}`);
+  const part = (options: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat("es-AR", { ...options, timeZone: BUSINESS_TIMEZONE })
+      .format(date)
+      .replace(".", "");
+  return {
+    weekday: part({ weekday: "short" }),
+    day: part({ day: "numeric" }),
+    month: part({ month: "short" }),
+  };
+}
+
 /** Un timestamptz ISO -> "HH:MM" en hora de Argentina, para mostrar turnos guardados. */
 export function formatTimeAR(iso: string): string {
   return new Intl.DateTimeFormat("es-AR", {

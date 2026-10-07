@@ -41,7 +41,7 @@ export function DaySchedule({ staffId }: { staffId: string }) {
             onClick={() => setDateStr(d)}
             className={`shrink-0 whitespace-nowrap rounded-lg border px-3 py-2 text-xs font-medium capitalize ${
               dateStr === d
-                ? "border-accent bg-accent text-accent-foreground"
+                ? "border-accent bg-accent-soft text-foreground ring-1 ring-accent"
                 : "border-border bg-surface hover:border-border-strong"
             }`}
           >
@@ -54,7 +54,7 @@ export function DaySchedule({ staffId }: { staffId: string }) {
         {isPending && <p className="text-sm text-muted">Cargando...</p>}
 
         {!isPending && schedule && "error" in schedule && (
-          <p className="text-sm text-red-400">{schedule.error}</p>
+          <p className="form-error">{schedule.error}</p>
         )}
 
         {!isPending && schedule && !("error" in schedule) && !schedule.works && (
@@ -62,7 +62,7 @@ export function DaySchedule({ staffId }: { staffId: string }) {
         )}
 
         {!isPending && schedule && !("error" in schedule) && schedule.works && (
-          <div className="flex flex-col gap-1">
+          <div className="field">
             <p className="text-sm text-muted">
               Trabaja de{" "}
               {schedule.workingRanges
@@ -80,7 +80,7 @@ export function DaySchedule({ staffId }: { staffId: string }) {
                 {schedule.freeRanges.map((r, i) => (
                   <span
                     key={i}
-                    className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-sm text-emerald-400"
+                    className="rounded-lg border border-success-border bg-success-soft px-3 py-1 text-sm text-success"
                   >
                     {r.start} a {r.end}
                   </span>

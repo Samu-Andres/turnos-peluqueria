@@ -1,42 +1,48 @@
 import Link from "next/link";
+import { CalendarDays, ChevronRight, Clock } from "lucide-react";
 import { requireStaffSelf } from "@/lib/dashboard/require-staff-access";
-import { signOut } from "@/lib/actions/auth";
 
 export default async function StaffHomePage() {
   const { business, staff } = await requireStaffSelf();
 
+  const tiles = [
+    {
+      href: "/staff/turnos",
+      icon: CalendarDays,
+      title: "Tus turnos",
+      text: "Confirmá, reprogramá o marcá como completados.",
+    },
+    {
+      href: "/staff/horarios",
+      icon: Clock,
+      title: "Tus horarios",
+      text: "Los días y horas en que te pueden reservar.",
+    },
+  ];
+
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          Hola, {staff.full_name} · {business.name}
-        </p>
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="text-sm font-medium text-muted underline"
-          >
-            Cerrar sesión
-          </button>
-        </form>
-      </div>
+    <main className="page">
+      <p className="eyebrow">{business.name}</p>
+      <h1 className="page-title mt-2">Hola, {staff.full_name}</h1>
+      <p className="page-subtitle">Desde acá manejás tu agenda.</p>
 
-      <h1 className="text-2xl font-bold">Tu panel</h1>
-
-      <div className="mt-8 flex flex-col gap-3">
-        <Link
-          href="/staff/turnos"
-          className="rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium transition-colors hover:border-border-strong hover:text-accent"
-        >
-          Tus turnos →
-        </Link>
-        <Link
-          href="/staff/horarios"
-          className="rounded-lg border border-border bg-surface px-4 py-3 text-sm font-medium transition-colors hover:border-border-strong hover:text-accent"
-        >
-          Tus horarios →
-        </Link>
-      </div>
+      <nav aria-label="Tu agenda" className="mt-8 grid gap-3 sm:grid-cols-2">
+        {tiles.map(({ href, icon: Icon, title, text }) => (
+          <Link key={href} href={href} className="card-interactive group flex items-center gap-4 p-5">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+              <Icon aria-hidden className="h-5 w-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold">{title}</p>
+              <p className="mt-0.5 text-sm text-muted">{text}</p>
+            </div>
+            <ChevronRight
+              aria-hidden
+              className="h-5 w-5 shrink-0 text-muted transition-colors group-hover:text-accent"
+            />
+          </Link>
+        ))}
+      </nav>
     </main>
   );
 }

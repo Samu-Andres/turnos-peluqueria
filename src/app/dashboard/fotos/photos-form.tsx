@@ -23,8 +23,8 @@ export function PhotosForm() {
 
   return (
     <form ref={formRef} action={formAction} className="mt-4 flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="photos" className="text-sm font-medium">
+      <div className="field">
+        <label htmlFor="photos" className="label">
           Fotos (podés elegir varias)
         </label>
         <input
@@ -39,7 +39,7 @@ export function PhotosForm() {
       </div>
 
       {state.error && (
-        <p className="text-sm text-red-400" role="alert">
+        <p className="form-error" role="alert">
           {state.error}
         </p>
       )}
@@ -47,7 +47,7 @@ export function PhotosForm() {
       <button
         type="submit"
         disabled={pending}
-        className="self-start rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+        className="self-start rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover disabled:opacity-50"
       >
         {pending ? "Subiendo..." : "Subir fotos"}
       </button>

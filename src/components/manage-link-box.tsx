@@ -26,8 +26,8 @@ export function ManageLinkBox({ token }: { token: string }) {
   }
 
   return (
-    <div className="mt-4 rounded-lg border border-accent/40 bg-accent/10 px-4 py-3">
-      <p className="text-sm text-foreground">
+    <div className="mb-10 mt-4 rounded-xl border border-accent/30 bg-accent-soft px-4 py-4">
+      <p className="text-sm font-medium text-foreground">
         Guardá este link para cancelar o reprogramar tu turno más adelante:
       </p>
       <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -35,7 +35,7 @@ export function ManageLinkBox({ token }: { token: string }) {
         <button
           type="button"
           onClick={handleCopy}
-          className="shrink-0 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted transition-colors hover:border-accent hover:text-accent"
+          className="btn btn-secondary btn-sm shrink-0"
         >
           {copied ? "¡Copiado!" : "Copiar"}
         </button>

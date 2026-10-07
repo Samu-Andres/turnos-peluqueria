@@ -28,8 +28,8 @@ export function StaffForm({
       action={formAction}
       className="mt-4 flex flex-col gap-4"
     >
-      <div className="flex flex-col gap-1">
-        <label htmlFor="full_name" className="text-sm font-medium">
+      <div className="field">
+        <label htmlFor="full_name" className="label">
           Nombre
         </label>
         <input
@@ -38,13 +38,13 @@ export function StaffForm({
           type="text"
           required
           placeholder="Andrea Gómez"
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+          className="input"
         />
       </div>
 
       {requiresAccount && (
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="text-sm font-medium">
+        <div className="field">
+          <label htmlFor="email" className="label">
             Mail (opcional)
           </label>
           <input
@@ -52,7 +52,7 @@ export function StaffForm({
             name="email"
             type="email"
             placeholder="andrea@mail.com"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
           <span className="text-xs text-muted">
             Si ponés su mail, le mandamos una invitación para que tenga su
@@ -63,13 +63,13 @@ export function StaffForm({
       )}
 
       {state.notice && (
-        <p className="text-sm text-amber-400" role="status">
+        <p className="text-sm text-warning" role="status">
           {state.notice}
         </p>
       )}
 
       {state.error && (
-        <p className="text-sm text-red-400" role="alert">
+        <p className="form-error" role="alert">
           {state.error}
         </p>
       )}
@@ -77,7 +77,7 @@ export function StaffForm({
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+        className="btn btn-primary"
       >
         {pending ? "Guardando..." : "Agregar persona"}
       </button>

@@ -40,15 +40,15 @@ export default async function ReprogramarTurnoStaffPage({
   )}`;
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
+    <main className="page">
       <Link
         href="/staff/turnos"
-        className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+        className="back-link"
       >
         ← Volver a tus turnos
       </Link>
 
-      <h1 className="mt-4 text-2xl font-bold">Reprogramar turno</h1>
+      <h1 className="page-title mt-4">Reprogramar turno</h1>
 
       <RescheduleFlow
         bookingId={booking.id}

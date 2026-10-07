@@ -15,7 +15,7 @@ export function CompleteBookingButton({ bookingId }: { bookingId: string }) {
           await markBookingCompleted(bookingId);
         })
       }
-      className="text-sm font-medium text-muted underline disabled:opacity-60"
+      className="action"
     >
       Marcar como completado
     </button>

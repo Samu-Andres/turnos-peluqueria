@@ -32,21 +32,21 @@ export function StaffRow({
 
   if (editing) {
     return (
-      <li className="rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-border-strong">
+      <li className="card px-4 py-4">
         <form action={handleSave} className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">Nombre</label>
+          <div className="field">
+            <label className="label">Nombre</label>
             <input
               name="full_name"
               type="text"
               required
               defaultValue={staff.full_name}
-              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+              className="input"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-400" role="alert">
+            <p className="form-error" role="alert">
               {error}
             </p>
           )}
@@ -55,14 +55,14 @@ export function StaffRow({
             <button
               type="submit"
               disabled={isSaving}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+              className="btn btn-primary"
             >
               {isSaving ? "Guardando..." : "Guardar"}
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+              className="action"
             >
               Cancelar
             </button>
@@ -73,7 +73,7 @@ export function StaffRow({
   }
 
   return (
-    <li className="flex flex-col gap-3 rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-border-strong sm:flex-row sm:items-center sm:justify-between">
+    <li className="card flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
       <div className={staff.active ? "" : "opacity-50"}>
         <p className="font-medium">{staff.full_name}</p>
         {staff.email && (
@@ -83,7 +83,7 @@ export function StaffRow({
           <p className="text-sm text-muted">inactivo</p>
         )}
         {staff.active && !hasHours && (
-          <p className="text-sm text-amber-400">
+          <p className="text-sm text-warning">
             Sin horarios cargados: todavía no le pueden reservar.
           </p>
         )}
@@ -92,14 +92,14 @@ export function StaffRow({
       <div className="flex flex-wrap items-center gap-3 sm:shrink-0">
         <Link
           href={`/dashboard/staff/${staff.id}/turnos`}
-          className="text-sm font-medium text-muted underline"
+          className="action"
         >
           Turnos
         </Link>
 
         <Link
           href={`/dashboard/staff/${staff.id}/horarios`}
-          className="text-sm font-medium text-muted underline"
+          className="action"
         >
           Horarios
         </Link>
@@ -107,7 +107,7 @@ export function StaffRow({
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="text-sm font-medium text-muted underline"
+          className="action"
         >
           Editar
         </button>
@@ -120,7 +120,7 @@ export function StaffRow({
               await toggleStaffActive(staff.id, !staff.active);
             })
           }
-          className="text-sm font-medium text-muted underline disabled:opacity-60"
+          className="action"
         >
           {staff.active ? "Desactivar" : "Activar"}
         </button>
@@ -135,7 +135,7 @@ export function StaffRow({
                   await deleteStaff(staff.id);
                 })
               }
-              className="text-sm font-medium text-red-400 underline disabled:opacity-60"
+              className="action-danger"
             >
               Confirmar
             </button>
@@ -143,7 +143,7 @@ export function StaffRow({
               type="button"
               disabled={isPending}
               onClick={() => setConfirmingDelete(false)}
-              className="text-sm text-muted underline"
+              className="action"
             >
               Cancelar
             </button>
@@ -152,7 +152,7 @@ export function StaffRow({
           <button
             type="button"
             onClick={() => setConfirmingDelete(true)}
-            className="text-sm text-muted underline"
+            className="action"
           >
             Borrar
           </button>

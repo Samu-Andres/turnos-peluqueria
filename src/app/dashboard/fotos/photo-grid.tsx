@@ -23,7 +23,7 @@ function PhotoTile({ photo }: { photo: BusinessPhoto }) {
             type="button"
             disabled={isPending}
             onClick={() => startTransition(() => deleteBusinessPhoto(photo.id))}
-            className="font-medium text-red-400 underline disabled:opacity-60"
+            className="font-medium text-danger underline disabled:opacity-60"
           >
             Confirmar
           </button>
@@ -31,7 +31,7 @@ function PhotoTile({ photo }: { photo: BusinessPhoto }) {
             type="button"
             disabled={isPending}
             onClick={() => setConfirming(false)}
-            className="text-muted underline"
+            className="action"
           >
             Cancelar
           </button>

@@ -47,20 +47,20 @@ export default async function MiTurnoPage({
     booking.status === "pending" || booking.status === "confirmed";
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
+    <main className="page">
       {business && (
         <Link
           href={`/${business.slug}`}
-          className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+          className="back-link"
         >
           ← Volver a {business.name}
         </Link>
       )}
 
-      <h1 className="mt-4 text-2xl font-bold">Tu turno</h1>
+      <h1 className="page-title mt-4">Tu turno</h1>
 
       {reprogramado === "1" && (
-        <p className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+        <p className="alert-success mt-4">
           ¡Listo! Reprogramamos tu turno.
         </p>
       )}
@@ -92,7 +92,7 @@ export default async function MiTurnoPage({
           <div className="mt-3 flex flex-wrap items-center gap-4">
             <Link
               href={`/mi-turno/${token}/reprogramar`}
-              className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+              className="action"
             >
               Reprogramar
             </Link>

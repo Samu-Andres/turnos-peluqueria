@@ -12,14 +12,14 @@ export default function ResetPasswordPage() {
   );
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4 sm:px-6">
+    <main className="page-narrow">
       <div>
-        <h1 className="text-2xl font-bold">Elegí tu nueva contraseña</h1>
+        <h1 className="page-title">Elegí tu nueva contraseña</h1>
       </div>
 
-      <form action={formAction} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="password" className="text-sm font-medium">
+      <form action={formAction} className="card flex flex-col gap-4 p-5 sm:p-6">
+        <div className="field">
+          <label htmlFor="password" className="label">
             Nueva contraseña
           </label>
           <input
@@ -28,12 +28,12 @@ export default function ResetPasswordPage() {
             type="password"
             required
             autoComplete="new-password"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+            className="input"
           />
         </div>
 
         {state.error && (
-          <p className="text-sm text-red-400" role="alert">
+          <p className="form-error" role="alert">
             {state.error}
           </p>
         )}
@@ -41,7 +41,7 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+          className="btn btn-primary"
         >
           {pending ? "Guardando..." : "Guardar contraseña"}
         </button>

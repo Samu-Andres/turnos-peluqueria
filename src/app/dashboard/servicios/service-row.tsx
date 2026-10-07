@@ -30,22 +30,22 @@ export function ServiceRow({ service }: { service: Service }) {
 
   if (editing) {
     return (
-      <li className="rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-border-strong">
+      <li className="card px-4 py-4">
         <form action={handleSave} className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">Nombre</label>
+          <div className="field">
+            <label className="label">Nombre</label>
             <input
               name="name"
               type="text"
               required
               defaultValue={service.name}
-              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+              className="input"
             />
           </div>
 
           <div className="flex gap-4">
             <div className="flex flex-1 flex-col gap-1">
-              <label className="text-sm font-medium">Duración (min)</label>
+              <label className="label">Duración (min)</label>
               <input
                 name="duration_minutes"
                 type="number"
@@ -53,11 +53,11 @@ export function ServiceRow({ service }: { service: Service }) {
                 step={5}
                 required
                 defaultValue={service.duration_minutes}
-                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+                className="input"
               />
             </div>
             <div className="flex flex-1 flex-col gap-1">
-              <label className="text-sm font-medium">Precio</label>
+              <label className="label">Precio</label>
               <input
                 name="price"
                 type="number"
@@ -65,23 +65,23 @@ export function ServiceRow({ service }: { service: Service }) {
                 step={0.01}
                 required
                 defaultValue={service.price}
-                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+                className="input"
               />
             </div>
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">Descripción (opcional)</label>
+          <div className="field">
+            <label className="label">Descripción (opcional)</label>
             <textarea
               name="description"
               rows={2}
               defaultValue={service.description ?? ""}
-              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
+              className="input"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-400" role="alert">
+            <p className="form-error" role="alert">
               {error}
             </p>
           )}
@@ -90,14 +90,14 @@ export function ServiceRow({ service }: { service: Service }) {
             <button
               type="submit"
               disabled={isSaving}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm shadow-black/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+              className="btn btn-primary"
             >
               {isSaving ? "Guardando..." : "Guardar"}
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="text-sm text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+              className="action"
             >
               Cancelar
             </button>
@@ -108,7 +108,7 @@ export function ServiceRow({ service }: { service: Service }) {
   }
 
   return (
-    <li className="flex flex-col gap-3 rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-border-strong sm:flex-row sm:items-center sm:justify-between">
+    <li className="card flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
       <div className={service.active ? "" : "opacity-50"}>
         <p className="font-medium">{service.name}</p>
         <p className="text-sm text-muted">
@@ -121,7 +121,7 @@ export function ServiceRow({ service }: { service: Service }) {
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="text-sm font-medium text-muted underline"
+          className="action"
         >
           Editar
         </button>
@@ -134,7 +134,7 @@ export function ServiceRow({ service }: { service: Service }) {
               await toggleServiceActive(service.id, !service.active);
             })
           }
-          className="text-sm font-medium text-muted underline disabled:opacity-60"
+          className="action"
         >
           {service.active ? "Desactivar" : "Activar"}
         </button>
@@ -149,7 +149,7 @@ export function ServiceRow({ service }: { service: Service }) {
                   await deleteService(service.id);
                 })
               }
-              className="text-sm font-medium text-red-400 underline disabled:opacity-60"
+              className="action-danger"
             >
               Confirmar
             </button>
@@ -157,7 +157,7 @@ export function ServiceRow({ service }: { service: Service }) {
               type="button"
               disabled={isPending}
               onClick={() => setConfirmingDelete(false)}
-              className="text-sm text-muted underline"
+              className="action"
             >
               Cancelar
             </button>
@@ -166,7 +166,7 @@ export function ServiceRow({ service }: { service: Service }) {
           <button
             type="button"
             onClick={() => setConfirmingDelete(true)}
-            className="text-sm text-muted underline"
+            className="action"
           >
             Borrar
           </button>
