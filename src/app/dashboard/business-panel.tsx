@@ -11,9 +11,11 @@ import type { Business } from "@/types/database";
 export function BusinessPanel({
   business,
   metrics,
+  setupSteps,
 }: {
   business: Business;
   metrics: BusinessMetrics;
+  setupSteps: string[];
 }) {
   const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -70,6 +72,19 @@ export function BusinessPanel({
           {copied ? "¡Copiado!" : "Copiar"}
         </button>
       </div>
+
+      {setupSteps.length > 0 && (
+        <div className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm">
+          <p className="font-medium text-amber-400">
+            Tus clientes todavía no pueden reservar. Te falta:
+          </p>
+          <ul className="mt-1 list-inside list-disc text-amber-400/90">
+            {setupSteps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="mt-4 grid grid-cols-3 gap-2">
         <div className="rounded-lg border border-border bg-surface px-2 py-3 text-center">

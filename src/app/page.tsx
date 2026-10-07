@@ -19,8 +19,15 @@ export default async function Home() {
     role = profile?.role ?? null;
   }
 
+  // Sin esta lista, un cliente que entra a la portada no tiene cómo
+  // llegar a ninguna peluquería (solo con el link directo del negocio).
+  const { data: businesses } = await supabase
+    .from("businesses")
+    .select("id, name, slug, address, logo_url, serves_at_home")
+    .order("name", { ascending: true });
+
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 text-center sm:px-6">
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-16 text-center sm:px-6">
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-1/3 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/15 blur-[100px]"
@@ -116,6 +123,42 @@ export default async function Home() {
           )}
         </div>
       </div>
+
+      {role !== "owner" && role !== "staff" && businesses && businesses.length > 0 && (
+        <section className="relative mx-auto mt-14 w-full max-w-2xl text-left">
+          <h2 className="text-lg font-semibold">Peluquerías</h2>
+          <ul className="mt-4 flex flex-col gap-3">
+            {businesses.map((business) => (
+              <li key={business.id}>
+                <Link
+                  href={`/${business.slug}`}
+                  className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 transition-colors hover:border-accent"
+                >
+                  {business.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={business.logo_url}
+                      alt=""
+                      className="h-10 w-10 shrink-0 rounded-lg border border-border object-cover"
+                    />
+                  ) : null}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium">{business.name}</p>
+                    <p className="truncate text-sm text-muted">
+                      {business.serves_at_home
+                        ? "Atiende a domicilio"
+                        : business.address ?? ""}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-sm font-semibold text-accent">
+                    Reservar →
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   );
 }

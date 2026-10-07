@@ -11,6 +11,8 @@ function LoginForm() {
   const [state, formAction, pending] = useActionState(signIn, initialState);
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
+  const confirmed = searchParams.get("confirmado") === "1";
+  const confirmError = searchParams.get("error") === "confirmacion";
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4 sm:px-6">
@@ -20,6 +22,19 @@ function LoginForm() {
           Entrá para reservar un turno o administrar tu negocio.
         </p>
       </div>
+
+      {confirmed && (
+        <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+          ¡Tu email quedó confirmado! Ya podés entrar.
+        </p>
+      )}
+
+      {confirmError && (
+        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          El link ya se usó o venció. Si ya confirmaste tu email, entrá
+          normalmente; si no, registrate de nuevo.
+        </p>
+      )}
 
       <form action={formAction} className="flex flex-col gap-4">
         {next && <input type="hidden" name="next" value={next} />}

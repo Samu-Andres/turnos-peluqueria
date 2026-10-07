@@ -5,7 +5,13 @@ import { useState, useTransition } from "react";
 import { deleteStaff, toggleStaffActive, updateStaff } from "@/lib/actions/staff";
 import type { Staff } from "@/types/database";
 
-export function StaffRow({ staff }: { staff: Staff }) {
+export function StaffRow({
+  staff,
+  hasHours,
+}: {
+  staff: Staff;
+  hasHours: boolean;
+}) {
   const [isPending, startTransition] = useTransition();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -75,6 +81,11 @@ export function StaffRow({ staff }: { staff: Staff }) {
         )}
         {!staff.active && (
           <p className="text-sm text-muted">inactivo</p>
+        )}
+        {staff.active && !hasHours && (
+          <p className="text-sm text-amber-400">
+            Sin horarios cargados: todavía no le pueden reservar.
+          </p>
         )}
       </div>
 

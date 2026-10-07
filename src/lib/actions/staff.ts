@@ -7,15 +7,22 @@ import { getSiteOrigin } from "@/lib/site-url";
 
 export type StaffFormState = {
   error: string | null;
+  // Aviso no bloqueante: la persona se agregó igual, pero algo del
+  // extra (la invitación por mail) no salió y el dueño tiene que saberlo.
+  notice?: string | null;
 };
 
 /**
- * Agrega a alguien al staff. En un negocio con local propio
- * (serves_at_home = false) esa persona necesita su propia cuenta para
- * ver y manejar sus turnos, así que pedimos el mail y lo invitamos por
- * Supabase (crea la cuenta ya vinculada, sin contraseña: la define
- * sola/o al abrir el mail). En un negocio a domicilio (sin local, uno
- * solo trabajando) no hace falta cuenta: alcanza con el nombre.
+ * Agrega a alguien al staff. La persona queda agregada siempre (y con
+ * eso el negocio ya puede recibir reservas para ella, una vez que tenga
+ * horarios). En un negocio con local propio, si además se pone un mail,
+ * la invitamos por Supabase para que tenga su propia cuenta y maneje sus
+ * turnos; pero la invitación es un extra: si el mail falla (límite de
+ * envíos, mail ya registrado, SMTP sin configurar) no perdemos el alta.
+ *
+ * Si el mail es el del propio dueño (caso típico: barbero que trabaja
+ * solo en su local) no invitamos a nadie: el dueño ya maneja todo desde
+ * el panel.
  */
 export async function createStaff(
   _prevState: StaffFormState,
@@ -29,42 +36,63 @@ export async function createStaff(
     return { error: "Poné el nombre de la persona." };
   }
 
-  const requiresAccount = !business.serves_at_home;
+  const email = business.serves_at_home
+    ? ""
+    : String(formData.get("email") ?? "").trim().toLowerCase();
 
-  if (!requiresAccount) {
-    const { error } = await supabase.from("staff").insert({
+  const {
+    data: { user: owner },
+  } = await supabase.auth.getUser();
+  const isOwnerEmail = Boolean(email) && email === owner?.email?.toLowerCase();
+
+  const { data: created, error } = await supabase
+    .from("staff")
+    .insert({
       business_id: business.id,
       full_name,
-    });
+      email: email && !isOwnerEmail ? email : null,
+    })
+    .select("id")
+    .single();
 
-    if (error) {
-      return { error: error.message };
-    }
+  if (error || !created) {
+    return { error: error?.message ?? "No pudimos agregar a esa persona." };
+  }
 
-    revalidatePath("/dashboard/staff");
+  revalidatePath("/dashboard/staff");
+
+  if (!email || isOwnerEmail) {
     return { error: null };
   }
 
-  const email = String(formData.get("email") ?? "").trim();
+  const notice = await inviteStaffAccount(created.id, email, full_name);
+  return { error: null, notice };
+}
 
-  if (!email) {
-    return { error: "Poné el mail de la persona para invitarla." };
-  }
+/**
+ * Invita por mail a una persona ya agregada al staff y vincula la cuenta
+ * creada. Devuelve un aviso para el dueño si no se pudo (null si salió
+ * bien).
+ */
+async function inviteStaffAccount(
+  staffId: string,
+  email: string,
+  fullName: string
+): Promise<string | null> {
+  const fallback =
+    "La persona quedó agregada y ya puede recibir turnos (cargale los horarios), pero";
 
   let admin: ReturnType<typeof createAdminClient>;
   try {
     admin = createAdminClient();
   } catch {
-    return {
-      error:
-        "Falta configurar el servidor para poder invitar por mail (SUPABASE_SERVICE_ROLE_KEY).",
-    };
+    return `${fallback} no pudimos mandarle la invitación: falta configurar SUPABASE_SERVICE_ROLE_KEY en el servidor.`;
   }
 
   const origin = await getSiteOrigin();
   const { data: inviteData, error: inviteError } =
     await admin.auth.admin.inviteUserByEmail(email, {
-      data: { full_name, role: "staff" },
+      data: { full_name: fullName, role: "staff" },
       redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(
         "/staff/completar-registro"
       )}`,
@@ -75,26 +103,22 @@ export async function createStaff(
       inviteError?.code === "email_exists" ||
       inviteError?.code === "user_already_exists"
     ) {
-      return { error: "Ese mail ya tiene una cuenta en el sistema." };
+      return `${fallback} ese mail ya tiene una cuenta, así que no le mandamos invitación. Sus turnos los podés manejar vos desde acá.`;
     }
-    return {
-      error: inviteError?.message ?? "No pudimos enviar la invitación.",
-    };
+    if (inviteError?.code === "over_email_send_rate_limit") {
+      return `${fallback} se alcanzó el límite de mails por hora. Probá invitarla más tarde.`;
+    }
+    return `${fallback} no pudimos mandarle la invitación (${
+      inviteError?.message ?? "error desconocido"
+    }).`;
   }
 
-  const { error } = await supabase.from("staff").insert({
-    business_id: business.id,
-    full_name,
-    email,
-    user_id: inviteData.user.id,
-  });
+  await admin
+    .from("staff")
+    .update({ user_id: inviteData.user.id })
+    .eq("id", staffId);
 
-  if (error) {
-    return { error: error.message };
-  }
-
-  revalidatePath("/dashboard/staff");
-  return { error: null };
+  return null;
 }
 
 export async function toggleStaffActive(

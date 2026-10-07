@@ -45,21 +45,27 @@ export function StaffForm({
       {requiresAccount && (
         <div className="flex flex-col gap-1">
           <label htmlFor="email" className="text-sm font-medium">
-            Mail
+            Mail (opcional)
           </label>
           <input
             id="email"
             name="email"
             type="email"
-            required
             placeholder="andrea@mail.com"
             className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted/50 focus:border-accent focus:ring-1 focus:ring-accent/30"
           />
           <span className="text-xs text-muted">
-            Le mandamos una invitación para que se cree su propia cuenta y
-            pueda ver y manejar sus turnos.
+            Si ponés su mail, le mandamos una invitación para que tenga su
+            propia cuenta y maneje sus turnos. Si sos vos o no hace falta,
+            dejalo vacío: igual va a poder recibir reservas.
           </span>
         </div>
+      )}
+
+      {state.notice && (
+        <p className="text-sm text-amber-400" role="status">
+          {state.notice}
+        </p>
       )}
 
       {state.error && (

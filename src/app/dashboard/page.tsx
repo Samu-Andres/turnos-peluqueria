@@ -42,6 +42,8 @@ export default async function DashboardPage({
     ? await getBusinessMetrics(supabase, business.id)
     : null;
 
+  const setupSteps = business ? await getMissingSetup(supabase, business.id) : [];
+
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
@@ -69,8 +71,56 @@ export default async function DashboardPage({
       {!business || !metrics ? (
         <CreateBusinessForm defaultServesAtHome={tipo === "domicilio"} />
       ) : (
-        <BusinessPanel business={business} metrics={metrics} />
+        <BusinessPanel
+          business={business}
+          metrics={metrics}
+          setupSteps={setupSteps}
+        />
       )}
     </main>
   );
+}
+
+/**
+ * Lo que le falta al negocio para que un cliente pueda reservar: sin
+ * servicios, sin staff activo o sin horarios cargados, la página pública
+ * no ofrece turnos y el dueño no tiene cómo darse cuenta solo.
+ */
+async function getMissingSetup(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  businessId: string
+): Promise<string[]> {
+  const [{ count: servicesCount }, { data: staff }] = await Promise.all([
+    supabase
+      .from("services")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", businessId)
+      .eq("active", true),
+    supabase
+      .from("staff")
+      .select("id")
+      .eq("business_id", businessId)
+      .eq("active", true),
+  ]);
+
+  const missing: string[] = [];
+  if (!servicesCount) {
+    missing.push("Cargá al menos un servicio.");
+  }
+  if (!staff || staff.length === 0) {
+    missing.push("Agregá al staff a quien atiende (si trabajás solo/a, agregate a vos).");
+    return missing;
+  }
+
+  const { count: hoursCount } = await supabase
+    .from("working_hours")
+    .select("id", { count: "exact", head: true })
+    .in(
+      "staff_id",
+      staff.map((person) => person.id)
+    );
+  if (!hoursCount) {
+    missing.push("Cargá los horarios de trabajo de tu staff.");
+  }
+  return missing;
 }

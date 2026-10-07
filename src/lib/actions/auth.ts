@@ -59,19 +59,6 @@ export async function signUp(
     return { error: "La contraseña tiene que tener al menos 6 caracteres." };
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: fullName, role },
-    },
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
   // A un/a dueño/a le preguntamos, ya en el signup, si tiene local o
   // trabaja a domicilio. Esa elección todavía no se puede guardar en
   // ningún lado (el negocio ni existe), así que viaja como query param
@@ -80,6 +67,25 @@ export async function signUp(
   const ownerNext =
     role === "owner" ? `/dashboard?tipo=${businessType}` : "/";
   const effectiveNext = next ?? ownerNext;
+
+  const supabase = await createClient();
+  const origin = await getSiteOrigin();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: fullName, role },
+      // Sin esto Supabase arma el link del mail con el "Site URL" del
+      // proyecto, que puede quedar apuntando a localhost.
+      emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(
+        effectiveNext
+      )}`,
+    },
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
 
   // Si el proyecto de Supabase tiene "Confirm email" activado, signUp no
   // devuelve sesión hasta que el usuario confirma desde el mail. El "next"

@@ -40,7 +40,14 @@ export default async function BusinessPage({
 
   const supabase = await createClient();
 
-  const [{ data: services }, { data: staff }, { data: photos }] = await Promise.all([
+  const [
+    { data: services },
+    { data: staff },
+    { data: photos },
+    {
+      data: { user },
+    },
+  ] = await Promise.all([
     supabase
       .from("services")
       .select("*")
@@ -58,12 +65,39 @@ export default async function BusinessPage({
       .select("id, url")
       .eq("business_id", business.id)
       .order("created_at", { ascending: true }),
+    supabase.auth.getUser(),
   ]);
 
   const hasStaff = Boolean(staff && staff.length > 0);
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
+      <nav className="mb-6 flex justify-end gap-4 text-sm">
+        {user ? (
+          <Link
+            href="/mis-turnos"
+            className="text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+          >
+            Mis turnos
+          </Link>
+        ) : (
+          <>
+            <Link
+              href={`/login?next=${encodeURIComponent(`/${business.slug}`)}`}
+              className="text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+            >
+              Iniciar sesión
+            </Link>
+            <Link
+              href={`/signup?next=${encodeURIComponent(`/${business.slug}`)}`}
+              className="text-muted underline decoration-muted/40 underline-offset-2 transition-colors hover:text-accent"
+            >
+              Crear cuenta
+            </Link>
+          </>
+        )}
+      </nav>
+
       <div className="flex items-center gap-4">
         {business.logo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -117,6 +151,11 @@ export default async function BusinessPage({
 
       <div className="mt-10">
         <h2 className="text-lg font-semibold">Servicios</h2>
+        {hasStaff && !user && (
+          <p className="mt-1 text-sm text-muted">
+            Elegí un servicio para reservar. No hace falta tener cuenta.
+          </p>
+        )}
 
         {!hasStaff && (
           <p className="mt-2 text-sm text-muted">
