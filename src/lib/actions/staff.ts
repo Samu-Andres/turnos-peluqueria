@@ -50,13 +50,16 @@ export async function createStaff(
     .insert({
       business_id: business.id,
       full_name,
-      email: email && !isOwnerEmail ? email : null,
+      // Solo mandamos la columna cuando hay a quién invitar: así agregar
+      // staff sin mail no depende de que exista staff.email en la base.
+      ...(email && !isOwnerEmail ? { email } : {}),
     })
     .select("id")
     .single();
 
   if (error || !created) {
-    return { error: error?.message ?? "No pudimos agregar a esa persona." };
+    console.error("createStaff:", error);
+    return { error: "No pudimos agregar a esa persona, probá de nuevo." };
   }
 
   revalidatePath("/dashboard/staff");

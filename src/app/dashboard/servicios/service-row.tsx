@@ -50,7 +50,8 @@ export function ServiceRow({ service }: { service: Service }) {
                 name="duration_minutes"
                 type="number"
                 min={1}
-                step={5}
+                step={1}
+                inputMode="numeric"
                 required
                 defaultValue={service.duration_minutes}
                 className="input"
@@ -62,7 +63,8 @@ export function ServiceRow({ service }: { service: Service }) {
                 name="price"
                 type="number"
                 min={0}
-                step={0.01}
+                step="any"
+                inputMode="decimal"
                 required
                 defaultValue={service.price}
                 className="input"

@@ -40,7 +40,7 @@ export default async function ServiciosPage() {
 
       <div className="mt-10 border-t border-border pt-8">
         <h2 className="text-lg font-semibold">Agregar servicio</h2>
-        <ServiceForm />
+        <ServiceForm existingNames={(services ?? []).map((s) => s.name)} />
       </div>
     </main>
   );

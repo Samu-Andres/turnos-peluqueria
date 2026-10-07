@@ -23,9 +23,9 @@ export async function createService(
   }
 
   const duration_minutes = Number(durationRaw);
-  if (!Number.isFinite(duration_minutes) || duration_minutes <= 0) {
+  if (!Number.isInteger(duration_minutes) || duration_minutes <= 0) {
     return {
-      error: "La duración tiene que ser un número de minutos mayor a 0.",
+      error: "Poné la duración en minutos enteros (por ejemplo 25 o 40).",
     };
   }
 
@@ -43,7 +43,8 @@ export async function createService(
   });
 
   if (error) {
-    return { error: error.message };
+    console.error("services:", error);
+    return { error: "No pudimos guardar el servicio, probá de nuevo." };
   }
 
   revalidatePath("/dashboard/servicios");
@@ -94,9 +95,9 @@ export async function updateService(
   }
 
   const duration_minutes = Number(durationRaw);
-  if (!Number.isFinite(duration_minutes) || duration_minutes <= 0) {
+  if (!Number.isInteger(duration_minutes) || duration_minutes <= 0) {
     return {
-      error: "La duración tiene que ser un número de minutos mayor a 0.",
+      error: "Poné la duración en minutos enteros (por ejemplo 25 o 40).",
     };
   }
 
@@ -117,7 +118,8 @@ export async function updateService(
     .eq("business_id", business.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("services:", error);
+    return { error: "No pudimos guardar el servicio, probá de nuevo." };
   }
 
   revalidatePath("/dashboard/servicios");
