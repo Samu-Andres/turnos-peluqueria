@@ -69,8 +69,8 @@ Supabase (Postgres, Auth, Storage y Row Level Security).
 ## Configuración de Supabase (necesaria en producción)
 
 - **Authentication → URL Configuration**
-  - *Site URL*: el dominio real (ej. `https://turnos.tudominio.com`),
-    nunca `localhost`.
+  - *Site URL*: https://turnos-peluqueria-dusky.vercel.app/
+  
   - *Redirect URLs*: agregá `https://turnos.tudominio.com/**` (y
     `http://localhost:3000/**` para desarrollo).
 - **Authentication → SMTP Settings**: configurá un proveedor propio
