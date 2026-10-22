@@ -35,11 +35,11 @@ export async function SiteHeader() {
     <header className="sticky top-0 z-20 border-b border-border/80 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-3 px-4 sm:px-6">
         <Link href="/" className="flex min-h-11 items-center gap-2.5 font-bold tracking-tight">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-accent-foreground shadow-sm">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-accent bg-accent/5 text-accent shadow-glow">
             <Scissors aria-hidden className="h-4.5 w-4.5" strokeWidth={2.2} />
           </span>
-          <span className="hidden sm:inline">Turnos Peluquería</span>
-          <span className="sm:hidden">Turnos</span>
+          <span className="hidden font-heading sm:inline">Turnos Peluquería</span>
+          <span className="font-heading sm:hidden">Turnos</span>
         </Link>
 
         <nav className="flex items-center gap-1 sm:gap-2">

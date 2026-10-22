@@ -30,14 +30,23 @@ export default async function Home() {
 
   return (
     <main className="flex-1">
-      <section className="border-b border-border bg-surface">
-        <div className="mx-auto grid w-full max-w-5xl gap-10 px-4 py-14 sm:px-6 sm:py-20 md:grid-cols-[1.2fr_1fr] md:items-center">
+      <section className="relative overflow-hidden border-b border-border bg-surface">
+        {/* Grilla tenue + halo neón detrás del título (decorativo). */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.035)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_at_30%_40%,black,transparent_70%)]"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-accent/15 blur-[110px]"
+        />
+        <div className="relative mx-auto grid w-full max-w-5xl gap-10 px-4 py-14 sm:px-6 sm:py-20 md:grid-cols-[1.2fr_1fr] md:items-center">
           <div>
             <p className="eyebrow">Reservas online</p>
             <h1 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
               Tu próximo corte,
               <br />
-              <span className="text-accent">a dos clics.</span>
+              <span className="text-glow text-accent">a dos clics.</span>
             </h1>
             <p className="mt-4 max-w-md text-base text-muted">
               Elegí la peluquería, el servicio y el horario que te quede

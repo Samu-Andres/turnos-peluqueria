@@ -1,40 +1,44 @@
 @import "tailwindcss";
 
 /*
- * Sistema de diseño "claro cálido": fondo crema, tarjetas blancas con
- * sombra suave y un solo color de acento (cobre) para las acciones.
- * Todos los colores de texto están medidos contra el fondo y las
- * tarjetas para pasar 4.5:1 (WCAG AA).
+ * Sistema de diseño "negro neón": fondo casi negro, texto blanco y un
+ * solo acento verde neón (tipo Monster) para botones, acciones y lo
+ * seleccionado, con un brillo suave. Contrastes medidos contra el fondo
+ * y las tarjetas: texto 17:1, secundario 7:1, acento 13:1 (WCAG AA).
  */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  --background: #faf7f2;
-  --surface: #ffffff;
-  --surface-hover: #f6f1ea;
-  --surface-sunken: #f2ece3;
-  --border: #e8e0d4;
-  --border-strong: #d4c8b7;
-  --foreground: #1c1917;
-  --muted: #6b6158;
+  --background: #060606;
+  --surface: #0f0f0f;
+  --surface-hover: #171717;
+  --surface-sunken: #141414;
+  --border: #242424;
+  --border-strong: #383838;
+  --foreground: #f5f5f5;
+  --muted: #a3a3a3;
 
-  --accent: #b4541a;
-  --accent-hover: #984514;
-  --accent-foreground: #ffffff;
-  --accent-soft: #fbeee4;
+  --accent: #a3e635;
+  --accent-hover: #bef264;
+  --accent-foreground: #060606;
+  --accent-soft: color-mix(in srgb, #a3e635 11%, transparent);
 
-  --success: #15803d;
-  --success-soft: #edfbf2;
-  --success-border: #bfe9cf;
-  --warning: #a35206;
-  --warning-soft: #fff6e8;
-  --warning-border: #f6d9a8;
-  --danger: #b91c1c;
-  --danger-soft: #fef2f2;
-  --danger-border: #f8cccc;
+  --success: #4ade80;
+  --success-soft: color-mix(in srgb, #4ade80 10%, transparent);
+  --success-border: color-mix(in srgb, #4ade80 35%, transparent);
+  --warning: #fbbf24;
+  --warning-soft: color-mix(in srgb, #fbbf24 10%, transparent);
+  --warning-border: color-mix(in srgb, #fbbf24 35%, transparent);
+  --danger: #f87171;
+  --danger-soft: color-mix(in srgb, #f87171 10%, transparent);
+  --danger-border: color-mix(in srgb, #f87171 38%, transparent);
 
-  --shadow-card: 0 1px 2px rgb(28 25 23 / 0.04), 0 4px 16px -6px rgb(28 25 23 / 0.08);
-  --shadow-raised: 0 2px 4px rgb(28 25 23 / 0.05), 0 12px 32px -12px rgb(28 25 23 / 0.18);
+  --shadow-card: inset 0 1px 0 rgb(255 255 255 / 0.03), 0 12px 32px -18px rgb(0 0 0 / 0.9);
+  --shadow-raised: 0 0 0 1px color-mix(in srgb, #a3e635 22%, transparent),
+    0 14px 36px -16px rgb(0 0 0 / 0.95);
+  /* Brillo neón "bajito": un halo suave, no un cartel luminoso. */
+  --glow: 0 0 14px -3px color-mix(in srgb, #a3e635 45%, transparent);
+  --glow-strong: 0 0 22px -2px color-mix(in srgb, #a3e635 60%, transparent);
 }
 
 @theme inline {
@@ -61,9 +65,11 @@
   --color-danger-border: var(--danger-border);
   --shadow-card: var(--shadow-card);
   --shadow-raised: var(--shadow-raised);
+  --shadow-glow: var(--glow);
+  --shadow-glow-strong: var(--glow-strong);
   --font-sans: var(--font-jakarta);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-jakarta);
+  --font-heading: var(--font-grotesk);
 }
 
 body {
@@ -92,8 +98,8 @@ code {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 22%, transparent);
-  color: var(--foreground);
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: #ffffff;
 }
 
 :focus-visible {
@@ -121,24 +127,30 @@ code {
   .section-title {
     @apply text-lg font-semibold;
   }
+  /* Brillo para palabras destacadas en verde (títulos, marca). */
+  .text-glow {
+    text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
 
   /* Tarjetas */
   .card {
     @apply rounded-2xl border border-border bg-surface shadow-card;
   }
   .card-interactive {
-    @apply rounded-2xl border border-border bg-surface shadow-card transition-[border-color,box-shadow] duration-200 hover:border-border-strong hover:shadow-raised;
+    @apply rounded-2xl border border-border bg-surface shadow-card transition-[border-color,box-shadow] duration-200 hover:border-accent/50 hover:shadow-glow;
   }
 
   /* Botones: 44px de alto mínimo para dedos */
   .btn {
     @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
   }
+  /* Principal: borde y texto neón con brillo suave; al pasar el mouse
+     se rellena. */
   .btn-primary {
-    @apply bg-accent text-accent-foreground shadow-sm hover:bg-accent-hover;
+    @apply border border-accent bg-accent/5 text-accent shadow-glow transition-[background-color,color,box-shadow] hover:bg-accent hover:text-accent-foreground hover:shadow-glow-strong disabled:hover:bg-accent/5 disabled:hover:text-accent;
   }
   .btn-secondary {
-    @apply border border-border bg-surface text-foreground hover:border-border-strong hover:bg-surface-hover;
+    @apply border border-border-strong bg-surface text-foreground hover:border-accent/60 hover:text-accent;
   }
   .btn-danger {
     @apply border border-danger-border bg-danger-soft text-danger hover:border-danger;
@@ -149,7 +161,7 @@ code {
 
   /* Acciones de texto en filas (Editar, Borrar, etc.) */
   .action {
-    @apply inline-flex min-h-9 cursor-pointer items-center rounded-lg px-2 text-sm font-medium text-muted transition-colors hover:bg-surface-hover hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-9 cursor-pointer items-center rounded-lg px-2 text-sm font-medium text-muted transition-colors hover:bg-surface-hover hover:text-accent disabled:cursor-not-allowed disabled:opacity-50;
   }
   .action-danger {
     @apply inline-flex min-h-9 cursor-pointer items-center rounded-lg px-2 text-sm font-medium text-danger transition-colors hover:bg-danger-soft disabled:cursor-not-allowed disabled:opacity-50;
@@ -166,7 +178,7 @@ code {
     @apply text-xs text-muted;
   }
   .input {
-    @apply min-h-11 w-full rounded-xl border border-border bg-surface px-3.5 py-2 text-base text-foreground outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-muted/70 hover:border-border-strong focus:border-accent focus:ring-3 focus:ring-accent/15 sm:text-sm;
+    @apply min-h-11 w-full rounded-xl border border-border-strong bg-background px-3.5 py-2 text-base text-foreground outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-muted/60 hover:border-muted/60 focus:border-accent focus:shadow-glow sm:text-sm;
   }
   .form-error {
     @apply text-sm font-medium text-danger;
@@ -193,10 +205,10 @@ code {
 
   /* Opciones seleccionables (servicio, staff, día, horario) */
   .option {
-    @apply cursor-pointer rounded-xl border border-border bg-surface text-sm font-medium text-foreground transition-colors duration-150 hover:border-border-strong hover:bg-surface-hover;
+    @apply cursor-pointer rounded-xl border border-border bg-surface text-sm font-medium text-foreground transition-colors duration-150 hover:border-accent/40 hover:bg-surface-hover;
   }
   .option-selected {
-    @apply cursor-pointer rounded-xl border border-accent bg-accent-soft text-sm font-medium text-foreground ring-1 ring-accent transition-colors duration-150;
+    @apply cursor-pointer rounded-xl border border-accent bg-accent-soft text-sm font-medium text-foreground shadow-glow transition-colors duration-150;
   }
 }
 

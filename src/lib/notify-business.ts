@@ -110,7 +110,7 @@ export async function notifyBusiness(
         )
         .join("")}
     </table>
-    <a href="${href}" style="display:inline-block;margin-top:22px;background:#b4541a;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:12px 20px;border-radius:12px;">Abrir la agenda</a>
+    <a href="${href}" style="display:inline-block;margin-top:22px;background:#0a0a0a;color:#a3e635;border:1px solid #a3e635;text-decoration:none;font-weight:600;font-size:15px;padding:12px 20px;border-radius:12px;">Abrir la agenda</a>
   </div>
 </div>`;
 

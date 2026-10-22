@@ -29,7 +29,7 @@ function PhotoTile({ photo }: { photo: BusinessPhoto }) {
               type="button"
               disabled={isPending}
               onClick={() => startTransition(() => deleteBusinessPhoto(photo.id))}
-              className="btn btn-sm bg-danger text-white hover:bg-danger/90"
+              className="btn btn-sm bg-danger text-background hover:bg-danger/90"
             >
               {isPending ? "Borrando..." : "Sí, borrar"}
             </button>
