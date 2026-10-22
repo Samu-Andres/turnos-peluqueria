@@ -12,9 +12,9 @@ export const metadata: Metadata = { title: "Mis turnos" };
 export default async function MisTurnosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ reservado?: string }>;
+  searchParams: Promise<{ reservado?: string; reprogramado?: string }>;
 }) {
-  const { reservado } = await searchParams;
+  const { reservado, reprogramado } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -57,6 +57,13 @@ export default async function MisTurnosPage({
     <main className="page">
       <h1 className="page-title">Mis turnos</h1>
       <p className="page-subtitle">Tus reservas en todas las peluquerías.</p>
+
+      {reprogramado === "1" && (
+        <p className="alert-success mt-4">
+          ¡Listo! Cambiamos tu turno. Queda pendiente hasta que el negocio
+          confirme el horario nuevo.
+        </p>
+      )}
 
       {reservado === "1" && (
         <p className="alert-success mt-4">

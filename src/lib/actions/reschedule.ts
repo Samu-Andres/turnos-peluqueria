@@ -79,9 +79,12 @@ export async function rescheduleBookingAsClient(
     new Date(startAt).getTime() + service.duration_minutes * 60000
   ).toISOString();
 
+  // Vuelve a "pendiente": el negocio tiene que enterarse del cambio y
+  // confirmar el horario nuevo (si no, un turno ya confirmado se movía
+  // sin que nadie lo viera en la agenda).
   const { error } = await supabase
     .from("bookings")
-    .update({ start_at: startAt, end_at: endAt })
+    .update({ start_at: startAt, end_at: endAt, status: "pending" })
     .eq("id", booking.id);
 
   if (error) {

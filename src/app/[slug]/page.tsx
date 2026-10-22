@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CircleCheck, Clock, Home, MapPin, Phone } from "lucide-react";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getBusinessBySlug } from "@/lib/booking/get-business";
+import { getBookableStaff, getBusinessBySlug } from "@/lib/booking/get-business";
 import { formatPrice } from "@/lib/format";
 import { ManageLinkBox } from "@/components/manage-link-box";
 
@@ -55,7 +55,7 @@ export default async function BusinessPage({
 
   const [
     { data: services },
-    { data: staff },
+    staff,
     { data: photos },
     {
       data: { user },
@@ -67,12 +67,7 @@ export default async function BusinessPage({
       .eq("business_id", business.id)
       .eq("active", true)
       .order("name", { ascending: true }),
-    supabase
-      .from("staff")
-      .select("id, full_name")
-      .eq("business_id", business.id)
-      .eq("active", true)
-      .order("full_name", { ascending: true }),
+    getBookableStaff(business.id),
     supabase
       .from("business_photos")
       .select("id, url")

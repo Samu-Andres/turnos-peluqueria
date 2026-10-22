@@ -559,7 +559,7 @@ declare
   updated_count integer;
 begin
   update public.bookings
-    set start_at = p_start, end_at = p_end
+    set start_at = p_start, end_at = p_end, status = 'pending'
     where manage_token = p_token
       and status in ('pending', 'confirmed');
   get diagnostics updated_count = row_count;
@@ -633,3 +633,111 @@ create policy "bookings: el propio staff actualiza sus turnos asignados"
         and staff.user_id = auth.uid()
     )
   );
+
+-- ---------------------------------------------------------------
+-- 5) Proteger los turnos.
+-- ---------------------------------------------------------------
+
+-- 5a) Borrar un servicio o una persona del staff ya NO se lleva puestos
+--     sus turnos (antes era "on delete cascade" y se perdían en silencio,
+--     incluso los futuros confirmados). Ahora la base no deja borrarlos
+--     mientras tengan turnos: hay que desactivarlos. Borrar el negocio
+--     entero sigue funcionando (los turnos caen por business_id).
+alter table public.bookings drop constraint if exists bookings_service_id_fkey;
+alter table public.bookings
+  add constraint bookings_service_id_fkey
+  foreign key (service_id) references public.services (id);
+
+alter table public.bookings drop constraint if exists bookings_staff_id_fkey;
+alter table public.bookings
+  add constraint bookings_staff_id_fkey
+  foreign key (staff_id) references public.staff (id);
+
+-- 5b) Reservar (con cuenta o como invitado): solo turnos pendientes, en
+--     el futuro, con un servicio y una persona activos de ESE negocio.
+--     Antes cualquiera con la clave pública podía crear turnos ya
+--     confirmados, en el pasado o mezclando negocios.
+drop policy if exists "bookings: con cuenta o como invitado" on public.bookings;
+create policy "bookings: con cuenta o como invitado"
+  on public.bookings for insert
+  with check (
+    (client_id is null or client_id = auth.uid())
+    and status = 'pending'
+    and start_at > now()
+    and exists (
+      select 1 from public.staff
+      where staff.id = bookings.staff_id
+        and staff.business_id = bookings.business_id
+        and staff.active
+    )
+    and exists (
+      select 1 from public.services
+      where services.id = bookings.service_id
+        and services.business_id = bookings.business_id
+        and services.active
+    )
+  );
+
+-- 5c) Un cliente (con cuenta o con el link del turno) solo puede
+--     cancelar o reprogramar un turno activo; no confirmárselo, ni cambiar
+--     el servicio, la persona o los datos de contacto. El dueño y la
+--     persona asignada pueden todo. Las tareas de mantenimiento (SQL
+--     Editor, service role) no pasan por este control.
+create or replace function public.bookings_guard_update()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  jwt_role text := coalesce(
+    nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role',
+    ''
+  );
+begin
+  if jwt_role not in ('anon', 'authenticated') then
+    return new;
+  end if;
+
+  if exists (
+       select 1 from public.businesses
+       where businesses.id = old.business_id
+         and businesses.owner_id = auth.uid()
+     )
+     or exists (
+       select 1 from public.staff
+       where staff.id = old.staff_id
+         and staff.user_id = auth.uid()
+     ) then
+    return new;
+  end if;
+
+  if old.status not in ('pending', 'confirmed')
+     or new.status not in ('pending', 'cancelled')
+     or new.business_id <> old.business_id
+     or new.staff_id <> old.staff_id
+     or new.service_id <> old.service_id
+     or new.client_id is distinct from old.client_id
+     or new.manage_token <> old.manage_token
+     or new.client_name is distinct from old.client_name
+     or new.client_phone is distinct from old.client_phone
+     or new.client_address is distinct from old.client_address
+     or new.notes is distinct from old.notes then
+    raise exception 'Ese cambio en el turno no está permitido'
+      using errcode = '42501';
+  end if;
+
+  -- Si cambia el horario, vuelve a "pendiente" para que el negocio lo vea.
+  if (new.start_at <> old.start_at or new.end_at <> old.end_at)
+     and new.status <> 'cancelled' then
+    new.status := 'pending';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists bookings_guard_update on public.bookings;
+create trigger bookings_guard_update
+  before update on public.bookings
+  for each row execute function public.bookings_guard_update();

@@ -139,16 +139,41 @@ export async function toggleStaffActive(
   revalidatePath("/dashboard/staff");
 }
 
-export async function deleteStaff(staffId: string): Promise<void> {
+/**
+ * Borra solo si no tiene turnos: en la base los turnos dependen de esta
+ * fila, y borrarla se llevaría puesto el historial (y los turnos futuros
+ * ya confirmados). Para que deje de aparecer alcanza con desactivarla.
+ */
+export async function deleteStaff(id: string): Promise<{ error: string | null }> {
   const { supabase, business } = await requireOwnerBusiness();
 
-  await supabase
+  const { count } = await supabase
+    .from("bookings")
+    .select("id", { count: "exact", head: true })
+    .eq("staff_id", id);
+
+  if (count) {
+    return { error: "Esta persona ya tiene turnos, así que no se puede borrar sin perderlos. Desactivala: deja de aparecer para reservar y se conserva el historial." };
+  }
+
+  const { error } = await supabase
     .from("staff")
     .delete()
-    .eq("id", staffId)
+    .eq("id", id)
     .eq("business_id", business.id);
 
+  if (error) {
+    console.error("deleteStaff:", error);
+    return {
+      error:
+        error.code === "23503"
+          ? "Esta persona ya tiene turnos, así que no se puede borrar sin perderlos. Desactivala: deja de aparecer para reservar y se conserva el historial."
+          : "No pudimos borrarlo, probá de nuevo.",
+    };
+  }
+
   revalidatePath("/dashboard/staff");
+  return { error: null };
 }
 
 export async function updateStaff(

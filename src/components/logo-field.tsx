@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ImagePlus } from "lucide-react";
+import { compressImage } from "@/lib/compress-image";
 
 export function LogoField({ currentUrl }: { currentUrl?: string | null }) {
   const [preview, setPreview] = useState<string | null>(currentUrl ?? null);
@@ -25,10 +26,19 @@ export function LogoField({ currentUrl }: { currentUrl?: string | null }) {
           name="logo"
           type="file"
           accept="image/png,image/jpeg,image/webp,image/svg+xml"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              setPreview(URL.createObjectURL(file));
+          onChange={async (e) => {
+            const input = e.currentTarget;
+            const file = input.files?.[0];
+            if (!file) return;
+            setPreview(URL.createObjectURL(file));
+
+            // Un logo no necesita más de 512px: lo achicamos acá para que
+            // la foto del celular no supere el límite de subida del server.
+            const compressed = await compressImage(file, { maxSide: 512 });
+            if (compressed !== file && typeof DataTransfer !== "undefined") {
+              const transfer = new DataTransfer();
+              transfer.items.add(compressed);
+              input.files = transfer.files;
             }
           }}
           className="block min-w-0 flex-1 cursor-pointer text-sm text-muted file:mr-3 file:min-h-10 file:cursor-pointer file:rounded-lg file:border-0 file:bg-accent-soft file:px-3.5 file:text-sm file:font-semibold file:text-accent"

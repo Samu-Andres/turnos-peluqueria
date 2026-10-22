@@ -1,26 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireStaffSelf } from "@/lib/dashboard/require-staff-access";
-import { formatDateTimeLongAR, formatTimeAR } from "@/lib/booking/time";
-import { CancelOwnerBookingButton } from "@/components/cancel-owner-booking-button";
-import { CompleteBookingButton } from "@/components/complete-booking-button";
-import { ConfirmBookingButton } from "@/components/confirm-booking-button";
 import { DaySchedule } from "@/components/day-schedule";
-import { STATUS_LABELS, statusBadgeClass } from "@/lib/booking/status-styles";
-import type { BookingStatus } from "@/types/database";
+import {
+  OwnerBookingCard,
+  type OwnerBookingRow,
+} from "@/components/owner-booking-card";
 
 export const metadata: Metadata = { title: "Mis turnos" };
 
-type BookingRow = {
-  id: string;
-  start_at: string;
-  end_at: string;
-  status: BookingStatus;
-  service_id: string;
-  client_name: string | null;
-  client_phone: string | null;
-  client_address: string | null;
-};
 
 export default async function StaffTurnosPage({
   searchParams,
@@ -37,7 +25,7 @@ export default async function StaffTurnosPage({
     supabase
       .from("bookings")
       .select(
-        "id, start_at, end_at, status, service_id, client_name, client_phone, client_address"
+        "id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address"
       )
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
@@ -46,7 +34,7 @@ export default async function StaffTurnosPage({
     supabase
       .from("bookings")
       .select(
-        "id, start_at, end_at, status, service_id, client_name, client_phone, client_address"
+        "id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address"
       )
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
@@ -67,50 +55,16 @@ export default async function StaffTurnosPage({
 
   const serviceById = new Map((servicesRes.data ?? []).map((s) => [s.id, s.name]));
 
-  function renderBooking(booking: BookingRow, pastBooking: boolean) {
+  function renderBooking(booking: OwnerBookingRow, pastBooking: boolean) {
     return (
-      <li
+      <OwnerBookingCard
         key={booking.id}
-        className="card px-4 py-4"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="font-medium">
-              {serviceById.get(booking.service_id) ?? "Servicio"} ·{" "}
-              {booking.client_name ?? "Cliente"}
-            </p>
-            <p className="mt-1 text-sm capitalize text-muted">
-              {formatDateTimeLongAR(booking.start_at)} a las{" "}
-              {formatTimeAR(booking.start_at)}
-            </p>
-            {booking.client_phone && (
-              <p className="mt-1 text-sm text-muted">Tel: {booking.client_phone}</p>
-            )}
-            {booking.client_address && (
-              <p className="mt-1 text-sm text-accent">
-                A domicilio: {booking.client_address}
-              </p>
-            )}
-          </div>
-          <span className={statusBadgeClass(booking.status)}>
-            {STATUS_LABELS[booking.status]}
-          </span>
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-4">
-          {booking.status === "pending" && (
-            <ConfirmBookingButton bookingId={booking.id} />
-          )}
-          {pastBooking && <CompleteBookingButton bookingId={booking.id} />}
-          <Link
-            href={`/staff/turnos/${booking.id}/reprogramar`}
-            className="action"
-          >
-            Reprogramar
-          </Link>
-          <CancelOwnerBookingButton bookingId={booking.id} />
-        </div>
-      </li>
+        booking={booking}
+        serviceName={serviceById.get(booking.service_id) ?? "Servicio"}
+        rescheduleHref={`/staff/turnos/${booking.id}/reprogramar`}
+        showDate
+        past={pastBooking}
+      />
     );
   }
 

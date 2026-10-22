@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import type { Business } from "@/types/database";
+import type { Business, Staff } from "@/types/database";
 
 /**
  * Busca un negocio por slug. Envuelto en cache() de React para que, si se
@@ -17,5 +17,36 @@ export const getBusinessBySlug = cache(
       .eq("slug", slug)
       .maybeSingle();
     return data;
+  }
+);
+
+/**
+ * Staff activo de un negocio que además tiene horarios cargados: son los
+ * únicos a los que se les puede reservar. Sin horarios, el cliente vería
+ * dos semanas sin ningún turno libre.
+ */
+export const getBookableStaff = cache(
+  async (businessId: string): Promise<Staff[]> => {
+    const supabase = await createClient();
+    const { data: staff } = await supabase
+      .from("staff")
+      .select("*")
+      .eq("business_id", businessId)
+      .eq("active", true)
+      .order("full_name", { ascending: true });
+
+    if (!staff || staff.length === 0) {
+      return [];
+    }
+
+    const { data: hours } = await supabase
+      .from("working_hours")
+      .select("staff_id")
+      .in(
+        "staff_id",
+        staff.map((person) => person.id)
+      );
+    const withHours = new Set((hours ?? []).map((h) => h.staff_id));
+    return staff.filter((person) => withHours.has(person.id));
   }
 );

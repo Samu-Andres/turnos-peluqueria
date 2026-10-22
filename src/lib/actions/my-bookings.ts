@@ -19,7 +19,8 @@ export async function cancelBooking(bookingId: string): Promise<void> {
     .from("bookings")
     .update({ status: "cancelled" })
     .eq("id", bookingId)
-    .eq("client_id", user.id);
+    .eq("client_id", user.id)
+    .in("status", ["pending", "confirmed"]);
 
   revalidatePath("/mis-turnos");
 }

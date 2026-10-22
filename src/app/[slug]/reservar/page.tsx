@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getBusinessBySlug } from "@/lib/booking/get-business";
+import { getBookableStaff, getBusinessBySlug } from "@/lib/booking/get-business";
 import { createClient } from "@/lib/supabase/server";
 import { BookingFlow } from "./booking-flow";
 
@@ -29,7 +29,7 @@ export default async function ReservarPage({
 
   const supabase = await createClient();
 
-  const [{ data: services }, { data: staff }, { data: userData }] =
+  const [{ data: services }, staff, { data: userData }] =
     await Promise.all([
       supabase
         .from("services")
@@ -37,12 +37,7 @@ export default async function ReservarPage({
         .eq("business_id", business.id)
         .eq("active", true)
         .order("name", { ascending: true }),
-      supabase
-        .from("staff")
-        .select("*")
-        .eq("business_id", business.id)
-        .eq("active", true)
-        .order("full_name", { ascending: true }),
+      getBookableStaff(business.id),
       supabase.auth.getUser(),
     ]);
 

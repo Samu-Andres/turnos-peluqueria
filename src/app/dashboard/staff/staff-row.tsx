@@ -15,6 +15,7 @@ export function StaffRow({
 }) {
   const [isPending, startTransition] = useTransition();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, startSaving] = useTransition();
@@ -74,7 +75,7 @@ export function StaffRow({
   }
 
   return (
-    <li className="card flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <li className="card flex flex-col gap-3 px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
       <div className={staff.active ? "" : "opacity-50"}>
         <p className="font-medium">{staff.full_name}</p>
         {staff.email && (
@@ -133,7 +134,11 @@ export function StaffRow({
               disabled={isPending}
               onClick={() =>
                 startTransition(async () => {
-                  await deleteStaff(staff.id);
+                  const result = await deleteStaff(staff.id);
+                  if (result.error) {
+                    setDeleteError(result.error);
+                    setConfirmingDelete(false);
+                  }
                 })
               }
               className="action-danger"
@@ -159,6 +164,11 @@ export function StaffRow({
           </button>
         )}
       </div>
+      {deleteError && (
+        <p className="form-error basis-full text-sm" role="alert">
+          {deleteError}
+        </p>
+      )}
     </li>
   );
 }

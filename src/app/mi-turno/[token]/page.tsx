@@ -68,7 +68,8 @@ export default async function MiTurnoPage({
 
       {reprogramado === "1" && (
         <p className="alert-success mt-4">
-          ¡Listo! Reprogramamos tu turno.
+          ¡Listo! Cambiamos tu turno. Queda pendiente hasta que el negocio
+          confirme el horario nuevo.
         </p>
       )}
 

@@ -13,6 +13,7 @@ import { submitWithoutReset } from "@/lib/submit-without-reset";
 export function ServiceRow({ service }: { service: Service }) {
   const [isPending, startTransition] = useTransition();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, startSaving] = useTransition();
@@ -111,7 +112,7 @@ export function ServiceRow({ service }: { service: Service }) {
   }
 
   return (
-    <li className="card flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <li className="card flex flex-col gap-3 px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
       <div className={service.active ? "" : "opacity-50"}>
         <p className="font-medium">{service.name}</p>
         <p className="text-sm text-muted">
@@ -149,7 +150,11 @@ export function ServiceRow({ service }: { service: Service }) {
               disabled={isPending}
               onClick={() =>
                 startTransition(async () => {
-                  await deleteService(service.id);
+                  const result = await deleteService(service.id);
+                  if (result.error) {
+                    setDeleteError(result.error);
+                    setConfirmingDelete(false);
+                  }
                 })
               }
               className="action-danger"
@@ -175,6 +180,11 @@ export function ServiceRow({ service }: { service: Service }) {
           </button>
         )}
       </div>
+      {deleteError && (
+        <p className="form-error basis-full text-sm" role="alert">
+          {deleteError}
+        </p>
+      )}
     </li>
   );
 }
