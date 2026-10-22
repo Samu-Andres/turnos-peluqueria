@@ -1,5 +1,8 @@
 "use server";
 
+import { getSiteOrigin } from "@/lib/site-url";
+import { notifyBusiness } from "@/lib/notify-business";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { combineDateAndTimeToISO } from "@/lib/booking/time";
@@ -94,6 +97,9 @@ export async function rescheduleBookingAsClient(
     console.error("reschedule:", error);
     return { error: "No pudimos reprogramar el turno, probá de nuevo." };
   }
+
+  const origin = await getSiteOrigin();
+  after(() => notifyBusiness({ id: booking.id }, "rescheduled", origin));
 
   redirect("/mis-turnos?reprogramado=1");
 }

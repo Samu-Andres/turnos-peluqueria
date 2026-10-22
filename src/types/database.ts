@@ -12,6 +12,9 @@
 
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
 export type ProfileRole = "owner" | "client" | "staff";
+// "online": lo reservó el cliente desde la web. "manual": lo cargó el
+// negocio a mano (turno por WhatsApp, teléfono o alguien que vino al local).
+export type BookingSource = "online" | "manual";
 
 export interface Database {
   public: {
@@ -208,6 +211,7 @@ export interface Database {
           client_name: string | null;
           client_phone: string | null;
           manage_token: string;
+          source: BookingSource;
           created_at: string;
         };
         Insert: {
@@ -224,6 +228,7 @@ export interface Database {
           client_name?: string | null;
           client_phone?: string | null;
           manage_token?: string;
+          source?: BookingSource;
           created_at?: string;
         };
         Update: {
@@ -240,6 +245,34 @@ export interface Database {
           client_name?: string | null;
           client_phone?: string | null;
           manage_token?: string;
+          source?: BookingSource;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      time_off: {
+        Row: {
+          id: string;
+          staff_id: string;
+          start_date: string;
+          end_date: string;
+          reason: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          staff_id: string;
+          start_date: string;
+          end_date: string;
+          reason?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          staff_id?: string;
+          start_date?: string;
+          end_date?: string;
+          reason?: string | null;
           created_at?: string;
         };
         Relationships: [];
@@ -277,6 +310,7 @@ export interface Database {
           client_name: string | null;
           client_phone: string | null;
           manage_token: string;
+          source: BookingSource;
           created_at: string;
         }[];
       };
@@ -307,3 +341,4 @@ export type Service = Database["public"]["Tables"]["services"]["Row"];
 export type WorkingHours = Database["public"]["Tables"]["working_hours"]["Row"];
 export type Booking = Database["public"]["Tables"]["bookings"]["Row"];
 export type BusinessPhoto = Database["public"]["Tables"]["business_photos"]["Row"];
+export type TimeOff = Database["public"]["Tables"]["time_off"]["Row"];

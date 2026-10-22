@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { requireStaffSelf } from "@/lib/dashboard/require-staff-access";
 import { DaySchedule } from "@/components/day-schedule";
 import {
@@ -13,9 +14,9 @@ export const metadata: Metadata = { title: "Mis turnos" };
 export default async function StaffTurnosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ reprogramado?: string }>;
+  searchParams: Promise<{ reprogramado?: string; cargado?: string }>;
 }) {
-  const { reprogramado } = await searchParams;
+  const { reprogramado, cargado } = await searchParams;
   const { supabase, staff } = await requireStaffSelf();
   const staffId = staff.id;
 
@@ -25,7 +26,7 @@ export default async function StaffTurnosPage({
     supabase
       .from("bookings")
       .select(
-        "id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address"
+        "id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address, source, notes"
       )
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
@@ -34,7 +35,7 @@ export default async function StaffTurnosPage({
     supabase
       .from("bookings")
       .select(
-        "id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address"
+        "id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address, source, notes"
       )
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
@@ -77,7 +78,19 @@ export default async function StaffTurnosPage({
         ← Volver a tu panel
       </Link>
 
-      <h1 className="page-title mt-4">Tus turnos</h1>
+      <div className="mt-4 flex items-start justify-between gap-4">
+        <h1 className="page-title">Tus turnos</h1>
+        <Link href="/staff/turnos/nuevo" className="btn btn-primary shrink-0">
+          <Plus aria-hidden className="h-4 w-4" />
+          Cargar turno
+        </Link>
+      </div>
+
+      {cargado === "1" && (
+        <p className="alert-success mt-4">
+          Turno cargado. Ese horario ya no se ofrece online.
+        </p>
+      )}
 
       {reprogramado === "1" && (
         <p className="alert-success mt-4">

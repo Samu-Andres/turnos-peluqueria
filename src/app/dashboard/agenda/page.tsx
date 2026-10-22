@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarX2, CircleCheck } from "lucide-react";
+import { CalendarX2, CircleCheck, Plus } from "lucide-react";
 import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
 import {
   addDaysToDateStr,
@@ -16,7 +16,7 @@ import {
 export const metadata: Metadata = { title: "Agenda" };
 
 const BOOKING_COLUMNS =
-  "id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address";
+  "id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address, source, notes";
 
 /**
  * Agenda general del negocio: los turnos de todo el staff juntos (con
@@ -27,9 +27,9 @@ const BOOKING_COLUMNS =
 export default async function AgendaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ barbero?: string; reprogramado?: string }>;
+  searchParams: Promise<{ barbero?: string; reprogramado?: string; cargado?: string }>;
 }) {
-  const { barbero, reprogramado } = await searchParams;
+  const { barbero, reprogramado, cargado } = await searchParams;
   const { supabase, business } = await requireOwnerBusiness();
 
   const { data: staffData } = await supabase
@@ -122,11 +122,23 @@ export default async function AgendaPage({
         ← Volver al panel
       </Link>
 
-      <h1 className="page-title mt-4">Agenda</h1>
+      <div className="mt-4 flex items-start justify-between gap-4">
+        <h1 className="page-title">Agenda</h1>
+        <Link href="/dashboard/agenda/nuevo" className="btn btn-primary shrink-0">
+          <Plus aria-hidden className="h-4 w-4" />
+          Cargar turno
+        </Link>
+      </div>
       <p className="page-subtitle">
         Los turnos de {business.name}
         {selectedStaff ? ` con ${selectedStaff.full_name}` : ", de todo el staff"}.
       </p>
+
+      {cargado === "1" && (
+        <p className="alert-success mt-4">
+          Turno cargado. Ese horario ya no se ofrece online.
+        </p>
+      )}
 
       {reprogramado === "1" && (
         <p className="alert-success mt-4">El turno quedó reprogramado.</p>

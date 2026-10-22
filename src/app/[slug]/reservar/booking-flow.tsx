@@ -15,6 +15,7 @@ import {
   getAvailableSlots,
   type BookingFormState,
 } from "@/lib/actions/booking-flow";
+import { getClosedDates } from "@/lib/actions/time-off";
 import type { Service, Staff } from "@/types/database";
 import { submitWithoutReset } from "@/lib/submit-without-reset";
 
@@ -75,6 +76,20 @@ export function BookingFlow({
     const today = todayInBusinessTZ();
     return Array.from({ length: DAYS_AHEAD }, (_, i) => addDaysToDateStr(today, i));
   }, []);
+
+  // Días que esa persona no atiende (no trabaja o está de franco): se
+  // muestran tachados en la tira para no ofrecer días sin turnos.
+  const [closedDates, setClosedDates] = useState<string[]>([]);
+  useEffect(() => {
+    if (!staffId) return;
+    let cancelled = false;
+    getClosedDates(staffId, dateOptions).then((dates) => {
+      if (!cancelled) setClosedDates(dates);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [staffId, dateOptions]);
 
   useEffect(() => {
     if (!staffId || !serviceId || !dateStr) {
@@ -170,7 +185,12 @@ export function BookingFlow({
 
       {serviceId && staffId && (
         <Step number={3} title="Elegí el día" done={Boolean(dateStr)}>
-          <DateStrip dates={dateOptions} value={dateStr} onChange={setDateStr} />
+          <DateStrip
+            dates={dateOptions}
+            value={dateStr}
+            onChange={setDateStr}
+            closedDates={closedDates}
+          />
         </Step>
       )}
 

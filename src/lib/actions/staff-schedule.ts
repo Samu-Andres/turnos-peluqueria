@@ -36,7 +36,14 @@ export type StaffDaySchedule =
       bookings: StaffDayBooking[];
       error?: undefined;
     }
-  | { works: false; bookings: StaffDayBooking[]; error?: undefined }
+  | {
+      works: false;
+      // Si no trabaja porque marcó el día como libre (no por su horario
+      // semanal): el motivo, o "" si no puso ninguno.
+      offReason?: string | null;
+      bookings: StaffDayBooking[];
+      error?: undefined;
+    }
   | { error: string };
 
 /**
@@ -91,6 +98,19 @@ export async function getStaffDaySchedule(
     clientPhone: b.client_phone,
     clientAddress: b.client_address,
   }));
+
+  const { data: timeOff } = await supabase
+    .from("time_off")
+    .select("reason")
+    .eq("staff_id", staffId)
+    .lte("start_date", dateStr)
+    .gte("end_date", dateStr)
+    .limit(1)
+    .maybeSingle();
+
+  if (timeOff) {
+    return { works: false, offReason: timeOff.reason ?? "", bookings };
+  }
 
   if (!workingHours || workingHours.length === 0) {
     return { works: false, bookings };

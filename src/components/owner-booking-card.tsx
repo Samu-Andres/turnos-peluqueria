@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { MapPin, Phone, User } from "lucide-react";
+import { MapPin, Phone, StickyNote, User } from "lucide-react";
 import { formatDateTimeLongAR, formatTimeAR } from "@/lib/booking/time";
 import { STATUS_LABELS, statusBadgeClass } from "@/lib/booking/status-styles";
 import { CancelOwnerBookingButton } from "@/components/cancel-owner-booking-button";
 import { CompleteBookingButton } from "@/components/complete-booking-button";
 import { ConfirmBookingButton } from "@/components/confirm-booking-button";
-import type { BookingStatus } from "@/types/database";
+import type { BookingSource, BookingStatus } from "@/types/database";
 
 export type OwnerBookingRow = {
   id: string;
@@ -17,6 +17,8 @@ export type OwnerBookingRow = {
   client_name: string | null;
   client_phone: string | null;
   client_address: string | null;
+  source?: BookingSource;
+  notes?: string | null;
 };
 
 /**
@@ -75,12 +77,19 @@ export function OwnerBookingCard({
               </p>
             )}
           </div>
-          <span className={statusBadgeClass(booking.status)}>
-            {STATUS_LABELS[booking.status]}
-          </span>
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            <span className={statusBadgeClass(booking.status)}>
+              {STATUS_LABELS[booking.status]}
+            </span>
+            {booking.source === "manual" && (
+              <span className="rounded-full bg-surface-sunken px-2 py-0.5 text-xs font-medium text-muted">
+                A mano
+              </span>
+            )}
+          </div>
         </div>
 
-        {(booking.client_phone || booking.client_address) && (
+        {(booking.client_phone || booking.client_address || booking.notes) && (
           <div className="mt-2 flex flex-col gap-1 text-sm text-muted">
             {booking.client_phone && (
               <a
@@ -95,6 +104,12 @@ export function OwnerBookingCard({
               <span className="inline-flex items-center gap-1.5">
                 <MapPin aria-hidden className="h-3.5 w-3.5 shrink-0" />
                 A domicilio: {booking.client_address}
+              </span>
+            )}
+            {booking.notes && (
+              <span className="inline-flex items-start gap-1.5">
+                <StickyNote aria-hidden className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                {booking.notes}
               </span>
             )}
           </div>

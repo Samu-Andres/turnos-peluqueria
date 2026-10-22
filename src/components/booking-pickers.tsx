@@ -17,13 +17,18 @@ export function DateStrip({
   value,
   onChange,
   label = "Elegí el día",
+  closedDates = [],
 }: {
   dates: string[];
   value: string | null;
   onChange: (dateStr: string) => void;
   label?: string;
+  // Días sin atención (no trabaja ese día de la semana, o día libre): se
+  // muestran pero no se pueden elegir.
+  closedDates?: string[];
 }) {
   const today = todayInBusinessTZ();
+  const closed = new Set(closedDates);
 
   return (
     <div
@@ -34,22 +39,30 @@ export function DateStrip({
       {dates.map((d) => {
         const parts = dateChipPartsAR(d);
         const selected = value === d;
+        const isClosed = closed.has(d);
         return (
           <button
             key={d}
             type="button"
+            disabled={isClosed}
             aria-pressed={selected}
-            aria-label={formatDateLongAR(d)}
+            aria-label={`${formatDateLongAR(d)}${isClosed ? ", cerrado" : ""}`}
             onClick={() => onChange(d)}
-            className={`flex w-16 shrink-0 snap-start flex-col items-center gap-0.5 py-2.5 ${
+            className={`flex w-16 shrink-0 snap-start flex-col items-center gap-0.5 py-2.5 disabled:cursor-not-allowed disabled:border-dashed disabled:bg-transparent disabled:opacity-50 ${
               selected ? "option-selected" : "option"
             }`}
           >
             <span className="text-xs font-medium capitalize text-muted">
               {d === today ? "Hoy" : parts.weekday}
             </span>
-            <span className="text-lg font-bold leading-tight">{parts.day}</span>
-            <span className="text-xs capitalize text-muted">{parts.month}</span>
+            <span
+              className={`text-lg font-bold leading-tight ${isClosed ? "line-through" : ""}`}
+            >
+              {parts.day}
+            </span>
+            <span className="text-xs capitalize text-muted">
+              {isClosed ? "cerrado" : parts.month}
+            </span>
           </button>
         );
       })}

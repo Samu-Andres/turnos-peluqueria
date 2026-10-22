@@ -32,14 +32,14 @@ export default async function StaffTurnosPage({
   const [{ data: upcomingRaw }, { data: pastRaw }] = await Promise.all([
     supabase
       .from("bookings")
-      .select("id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address")
+      .select("id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address, source, notes")
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
       .gte("start_at", nowISO)
       .order("start_at", { ascending: true }),
     supabase
       .from("bookings")
-      .select("id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address")
+      .select("id, staff_id, start_at, end_at, status, service_id, client_name, client_phone, client_address, source, notes")
       .eq("staff_id", staffId)
       .in("status", ["pending", "confirmed"])
       .lt("start_at", nowISO)

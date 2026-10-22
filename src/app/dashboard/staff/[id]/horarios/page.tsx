@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { requireOwnerBusiness } from "@/lib/dashboard/require-owner-business";
 import { saveWorkingHours } from "@/lib/actions/working-hours";
 import { WorkingHoursForm } from "@/components/working-hours-form";
+import { TimeOffManager } from "@/components/time-off-manager";
+import { todayInBusinessTZ } from "@/lib/booking/time";
 
 export default async function StaffHorariosPage({
   params,
@@ -27,7 +29,15 @@ export default async function StaffHorariosPage({
     .from("working_hours")
     .select("*")
     .eq("staff_id", staffId)
-    .order("day_of_week", { ascending: true });
+    .order("day_of_week", { ascending: true })
+    .order("start_time", { ascending: true });
+
+  const { data: timeOff } = await supabase
+    .from("time_off")
+    .select("*")
+    .eq("staff_id", staffId)
+    .gte("end_date", todayInBusinessTZ())
+    .order("start_date", { ascending: true });
 
   const action = saveWorkingHours.bind(null, staffId);
 
@@ -44,11 +54,14 @@ export default async function StaffHorariosPage({
         Horarios de {staff.full_name}
       </h1>
       <p className="mt-1 text-sm text-muted">
-        Tildá los días que trabaja y definí el horario. Los clientes solo
-        van a poder reservar turnos dentro de estos rangos.
+        Prendé los días que trabaja y poné el horario. Si cierra al
+        mediodía, agregá una segunda franja. Los clientes solo pueden
+        reservar dentro de estos horarios.
       </p>
 
       <WorkingHoursForm action={action} initialHours={hours ?? []} />
+
+      <TimeOffManager staffId={staffId} entries={timeOff ?? []} />
     </main>
   );
 }

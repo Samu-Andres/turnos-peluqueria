@@ -10,6 +10,7 @@ import {
   todayInBusinessTZ,
 } from "@/lib/booking/time";
 import { getAvailableSlots } from "@/lib/actions/booking-flow";
+import { getClosedDates } from "@/lib/actions/time-off";
 import type { RescheduleFormState } from "@/lib/actions/reschedule";
 import { submitWithoutReset } from "@/lib/submit-without-reset";
 
@@ -47,6 +48,19 @@ export function RescheduleFlow({
 
   const [error, setError] = useState<string | null>(null);
   const [isSaving, startSaving] = useTransition();
+
+  // Días que esa persona no atiende (no trabaja o está de franco): se
+  // muestran tachados en la tira para no ofrecer días sin turnos.
+  const [closedDates, setClosedDates] = useState<string[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    getClosedDates(staffId, dateOptions).then((dates) => {
+      if (!cancelled) setClosedDates(dates);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [staffId, dateOptions]);
 
   useEffect(() => {
     if (!dateStr) return;
@@ -89,6 +103,7 @@ export function RescheduleFlow({
         <DateStrip
           dates={dateOptions}
           value={dateStr}
+          closedDates={closedDates}
           onChange={(d) => {
             setDateStr(d);
             setTime(null);

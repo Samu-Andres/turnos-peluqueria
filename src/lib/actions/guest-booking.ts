@@ -1,5 +1,8 @@
 "use server";
 
+import { getSiteOrigin } from "@/lib/site-url";
+import { notifyBusiness } from "@/lib/notify-business";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -24,7 +27,13 @@ export async function getBookingByToken(token: string): Promise<Booking | null> 
 
 export async function cancelBookingByToken(token: string): Promise<void> {
   const supabase = await createClient();
-  await supabase.rpc("cancel_booking_by_token", { p_token: token });
+  const { data: cancelled } = await supabase.rpc("cancel_booking_by_token", {
+    p_token: token,
+  });
+  if (cancelled) {
+    const origin = await getSiteOrigin();
+    after(() => notifyBusiness({ token }, "cancelled", origin));
+  }
   revalidatePath(`/mi-turno/${token}`);
 }
 
@@ -90,6 +99,9 @@ export async function rescheduleBookingByToken(
   if (!ok) {
     return { error: "Ese turno ya no se puede reprogramar." };
   }
+
+  const origin = await getSiteOrigin();
+  after(() => notifyBusiness({ token }, "rescheduled", origin));
 
   redirect(`/mi-turno/${token}?reprogramado=1`);
 }

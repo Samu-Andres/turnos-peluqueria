@@ -22,6 +22,10 @@ necesidad de crear una cuenta.
 - **Cuentas de staff.** En negocios con local, cada persona del staff
   puede tener su propia cuenta (por invitación por mail) para ver y
   manejar solo sus turnos y sus horarios.
+- **Agenda real del local.** El negocio carga a mano los turnos que le
+  piden por WhatsApp o teléfono (así no se los reservan encima), maneja
+  horario cortado (varias franjas por día) y marca días libres o
+  vacaciones. Recibe un mail cuando un cliente reserva, cambia o cancela.
 - **Gestión del turno sin cuenta.** Al reservar como invitado, el cliente
   recibe un link para reprogramar o cancelar su turno.
 - **Disponibilidad real.** Los horarios libres se calculan a partir de los
@@ -132,3 +136,5 @@ variables de `.env.local.example`:
 - `SUPABASE_SERVICE_ROLE_KEY` (solo servidor: invitar staff por mail)
 - `NEXT_PUBLIC_SITE_URL` con el dominio real, para que los links de los
   mails y las vistas previas al compartir apunten ahí.
+- `BREVO_API_KEY` y `BREVO_SENDER_EMAIL` (opcionales): avisos por mail al
+  negocio cuando un cliente reserva, cambia o cancela un turno.

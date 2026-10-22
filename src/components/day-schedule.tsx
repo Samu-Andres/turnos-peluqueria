@@ -46,7 +46,11 @@ export function DaySchedule({ staffId }: { staffId: string }) {
         )}
 
         {!isPending && schedule && !("error" in schedule) && !schedule.works && (
-          <p className="text-sm text-muted">Ese día no trabaja.</p>
+          <p className="text-sm text-muted">
+            {typeof schedule.offReason === "string"
+              ? `Día libre${schedule.offReason ? `: ${schedule.offReason}` : ""}.`
+              : "Ese día no trabaja."}
+          </p>
         )}
 
         {!isPending && schedule && !("error" in schedule) && schedule.works && (

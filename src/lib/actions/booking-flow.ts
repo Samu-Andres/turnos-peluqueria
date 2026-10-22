@@ -1,5 +1,8 @@
 "use server";
 
+import { getSiteOrigin } from "@/lib/site-url";
+import { notifyBusiness } from "@/lib/notify-business";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -53,6 +56,18 @@ export async function getAvailableSlots(
 
   if (!service || !staff || service.business_id !== staff.business_id) {
     return { error: "No pudimos encontrar ese servicio o esa persona." };
+  }
+
+  // Día libre o vacaciones: ese día no se ofrece nada.
+  const { count: offCount } = await supabase
+    .from("time_off")
+    .select("id", { count: "exact", head: true })
+    .eq("staff_id", staffId)
+    .lte("start_date", dateStr)
+    .gte("end_date", dateStr);
+
+  if (offCount) {
+    return { slots: [] };
   }
 
   const day = dayOfWeekOf(dateStr);
@@ -222,6 +237,10 @@ export async function createBooking(
     console.error("createBooking:", error);
     return { error: "No pudimos reservar el turno, probá de nuevo." };
   }
+
+  // Aviso al negocio, después de responderle al cliente.
+  const origin = await getSiteOrigin();
+  after(() => notifyBusiness({ token: manageToken }, "new", origin));
 
   // Con cuenta: al listado de turnos, ahí ya puede cancelar o reprogramar.
   // Como invitado no hay dónde listarlo, así que volvemos a la página del
