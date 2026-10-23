@@ -97,16 +97,16 @@ export async function notifyBusiness(
 
     const subject = `${SUBJECTS[event]}: ${booking.client_name ?? "cliente"} · ${whenLabel}`;
     const htmlFor = (href: string) => `
-<div style="background:#faf7f2;padding:24px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1c1917;">
-  <div style="max-width:480px;margin:0 auto;background:#ffffff;border:1px solid #e8e0d4;border-radius:16px;padding:28px;">
-    <p style="margin:0;font-size:13px;color:#6b6158;">${escapeHtml(business.name)}</p>
-    <h1 style="margin:6px 0 12px;font-size:20px;">${SUBJECTS[event]}</h1>
-    <p style="margin:0 0 20px;font-size:15px;line-height:1.5;color:#4a423b;">${INTROS[event]}</p>
+<div style="background:#060606;padding:24px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#f5f5f5;">
+  <div style="max-width:480px;margin:0 auto;background:#0f0f0f;border:1px solid #242424;border-radius:16px;padding:28px;">
+    <p style="margin:0;font-size:13px;color:#a3e635;">${escapeHtml(business.name)}</p>
+    <h1 style="margin:6px 0 12px;font-size:20px;color:#f5f5f5;">${SUBJECTS[event]}</h1>
+    <p style="margin:0 0 20px;font-size:15px;line-height:1.5;color:#a3a3a3;">${INTROS[event]}</p>
     <table style="width:100%;border-collapse:collapse;font-size:15px;">
       ${rows
         .map(
           ([label, value]) =>
-            `<tr><td style="padding:6px 12px 6px 0;color:#6b6158;white-space:nowrap;vertical-align:top;">${label}</td><td style="padding:6px 0;font-weight:600;">${escapeHtml(value)}</td></tr>`
+            `<tr><td style="padding:6px 12px 6px 0;color:#8a8a8a;white-space:nowrap;vertical-align:top;">${label}</td><td style="padding:6px 0;font-weight:600;color:#f5f5f5;">${escapeHtml(value)}</td></tr>`
         )
         .join("")}
     </table>
